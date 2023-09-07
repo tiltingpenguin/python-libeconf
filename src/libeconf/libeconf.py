@@ -69,12 +69,13 @@ def econf_readFile(file_name, delim, comment):
     # return Pointer to object, no need to parse it
     result = c_void_p(None)
     c_file_name = file_name
-    c_delim = c_char(delim)
-    c_comment = c_char(comment)
+    c_delim = c_wchar(delim)
+    c_comment = c_wchar(comment)
     err = libeconf.econf_readFile(byref(result), c_file_name, byref(c_delim), byref(c_comment))
     if err != 0:
-        print(Econf_err(err))
-    return byref(result)
+        print("readFile: ", Econf_err(err))
+    print(result)
+    return result
 
 
 def econf_mergeFiles():
@@ -97,29 +98,47 @@ def econf_newIniFile():
     pass
 
 
-def econf_writeFile():
-    pass
+def econf_writeFile(kf, save_to_dir, file_name):
+    c_save_to_dir = c_char_p(save_to_dir)
+    c_file_name = c_char_p(file_name)
+    err = libeconf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
+    return err
 
 
-def econf_getPath():
-    pass
+def econf_getPath(kf):
+    # TODO: extract from pointer
+    return libeconf.econf_getPath(kf)
 
 
-def econf_getGroups():
-    pass
+# TODO: pass empty array
+def econf_getGroups(kf):
+    c_length = c_size_t()
+    c_groups = POINTER(c_char_p*3)
+    err = libeconf.econf_getGroups(kf, c_groups, c_length)
+    if err != 0:
+        print("getGroups: ", Econf_err(err))
+    print(c_groups)
+    return c_groups
 
 
-def econf_geKeys():
-    pass
+# TODO: pass empty array
+def econf_geKeys(kf, group=None):
+    c_group = c_char_p(group)
+    c_length = c_size_t()
+    c_keys = POINTER(c_char_p*3)
+    err = libeconf.econf_getKeys(kf, c_group, c_length, c_keys)
+    if err != 0:
+        print("getKeys: ", Econf_err(err))
+    return c_keys
 
 
 def econf_getIntValue(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+    c_group = c_wchar_p(group)
+    c_key = c_wchar_p(key)
     c_res = c_int32()
-    err = libeconf.econf_getIntValue(kf, byref(c_group), byref(c_key), byref(c_res))
+    err = libeconf.econf_getIntValue(kf, c_group, c_key, byref(c_res))
     if err != 0:
-        print(Econf_err(err))
+        print("getIntValue: ", Econf_err(err))
     return c_res.value
 
 
