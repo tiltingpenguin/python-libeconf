@@ -1,0 +1,14 @@
+# IDEs
+.vscode/
+.idea/
+.fleet/
+
+# Virtualenv
+venv/
+env/
+
+# cache
+**/**/__pycache__/
+
+# build
+build/
