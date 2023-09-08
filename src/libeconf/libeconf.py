@@ -54,7 +54,7 @@ class econf_file(Structure):
 
 
 libname = ctypes.util.find_library("econf")
-libeconf = CDLL(libname)
+econf = CDLL(libname)
 
 
 def econf_set_Value():
@@ -65,16 +65,14 @@ def econf_free():
     pass
 
 
-def econf_readFile(file_name, delim, comment):
+def econf_readFile(file_name: bytes, delim: bytes, comment: bytes):
     # return Pointer to object, no need to parse it
     result = c_void_p(None)
-    c_file_name = file_name
-    c_delim = c_wchar(delim)
-    c_comment = c_wchar(comment)
-    err = libeconf.econf_readFile(byref(result), c_file_name, byref(c_delim), byref(c_comment))
+    err = econf.econf_readFile(byref(result), file_name, delim, comment)
     if err != 0:
         print("readFile: ", Econf_err(err))
-    print(result)
+        return Econf_err(err)
+    # print(hex(result.value))
     return result
 
 
@@ -101,73 +99,126 @@ def econf_newIniFile():
 def econf_writeFile(kf, save_to_dir, file_name):
     c_save_to_dir = c_char_p(save_to_dir)
     c_file_name = c_char_p(file_name)
-    err = libeconf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
+    err = econf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
     return err
 
 
 def econf_getPath(kf):
-    # TODO: extract from pointer
-    return libeconf.econf_getPath(kf)
+    # extract from pointer
+    return econf.econf_getPath(kf)
 
 
-# TODO: pass empty array
 def econf_getGroups(kf):
     c_length = c_size_t()
-    c_groups = POINTER(c_char_p*3)
-    err = libeconf.econf_getGroups(kf, c_groups, c_length)
+    c_groups = c_void_p(None)
+    err = econf.econf_getGroups(kf, byref(c_length), byref(c_groups))
     if err != 0:
         print("getGroups: ", Econf_err(err))
-    print(c_groups)
-    return c_groups
+        return Econf_err(err)
+    arr = cast(c_groups, POINTER(c_char_p * c_length.value))
+    result = [i for i in arr.contents]
+    return result
 
 
-# TODO: pass empty array
-def econf_geKeys(kf, group=None):
-    c_group = c_char_p(group)
+# Not passing a group currently leads to ECONF_NOKEY error
+def econf_getKeys(kf, group=None):
     c_length = c_size_t()
-    c_keys = POINTER(c_char_p*3)
-    err = libeconf.econf_getKeys(kf, c_group, c_length, c_keys)
+    c_keys = c_void_p(None)
+    err = econf.econf_getKeys(kf, group, byref(c_length), byref(c_keys))
     if err != 0:
         print("getKeys: ", Econf_err(err))
-    return c_keys
+        return Econf_err(err)
+    arr = cast(c_keys, POINTER(c_char_p * c_length.value))
+    result = [i for i in arr.contents]
+    return result
 
 
 def econf_getIntValue(kf, group, key):
-    c_group = c_wchar_p(group)
-    c_key = c_wchar_p(key)
-    c_res = c_int32()
-    err = libeconf.econf_getIntValue(kf, c_group, c_key, byref(c_res))
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_int32()
+    err = econf.econf_getIntValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
         print("getIntValue: ", Econf_err(err))
-    return c_res.value
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getInt64Value():
-    pass
+def econf_getInt64Value(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_int64()
+    err = econf.econf_getInt64Value(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getInt64Value: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getUIntValue():
-    pass
+def econf_getUIntValue(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_uint32()
+    err = econf.econf_getUIntValue(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getUInt32Value: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getUInt64Value():
-    pass
+def econf_getUInt64Value(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_uint64()
+    err = econf.econf_getUInt64Value(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getUInt64Value: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getFloatValue():
-    pass
+def econf_getFloatValue(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_float()
+    err = econf.econf_getFloatValue(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getFloatValue: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getDoubleValue():
-    pass
+def econf_getDoubleValue(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_double()
+    err = econf.econf_getDoubleValue(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getDoubleValue: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getStringValue():
-    pass
+def econf_getStringValue(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_char_p()
+    err = econf.econf_getStringValue(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getStringValue: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getBoolValue():
-    pass
+def econf_getBoolValue(kf, group, key):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_bool()
+    err = econf.econf_getBoolValue(kf, c_group, c_key, byref(c_result))
+    if err != 0:
+        print("getBoolValue: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
 def econf_getIntValueDef():
