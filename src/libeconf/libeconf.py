@@ -161,7 +161,7 @@ def econf_getUIntValue(kf, group, key):
     c_result = c_uint32()
     err = econf.econf_getUIntValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getUInt32Value: ", Econf_err(err))
+        print("getUIntValue: ", Econf_err(err))
         return Econf_err(err)
     return c_result.value
 
@@ -221,36 +221,116 @@ def econf_getBoolValue(kf, group, key):
     return c_result.value
 
 
-def econf_getIntValueDef():
-    pass
+def econf_getIntValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_int32()
+    c_default = c_int32(default)
+    err = econf.econf_getIntValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getIntValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getInt64ValueDef():
-    pass
+def econf_getInt64ValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_int64()
+    c_default = c_int64(default)
+    err = econf.econf_getInt64ValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getInt64ValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getUIntValueDef():
-    pass
+def econf_getUIntValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_uint32()
+    c_default = c_uint32(default)
+    err = econf.econf_getUIntValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getUIntValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getUInt64ValueDef():
-    pass
+def econf_getUInt64ValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_uint64()
+    c_default = c_uint64(default)
+    err = econf.econf_getUInt64ValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getUInt64ValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getFloatValueDef():
-    pass
+def econf_getFloatValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_float()
+    c_default = c_float(default)
+    err = econf.econf_getFloatValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getFloatValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getDoubleVallueDef():
-    pass
+def econf_getDoubleValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_double()
+    c_default = c_double(default)
+    err = econf.econf_getDoubleValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getDoubleValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getStringValueDef():
-    pass
+def econf_getStringValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_char_p()
+    c_default = c_char_p(default)
+    err = econf.econf_getStringValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getStringValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
-def econf_getBoolValueDef():
-    pass
+def econf_getBoolValueDef(kf, group, key, default):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_result = c_bool()
+    c_default = c_bool(default)
+    err = econf.econf_getBoolValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    if err != 0:
+        if err == 5:
+            return c_default.value
+        print("getBoolValueDef: ", Econf_err(err))
+        return Econf_err(err)
+    return c_result.value
 
 
 def econf_setIntValue():
