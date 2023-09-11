@@ -453,10 +453,6 @@ def econf_errLocation(filename, line_nr):
     return c_filename.value, c_line_nr.value
 
 
-def econf_freeArray(arr: list):
-    pass
-
-
 def econf_freeFile(kf):
     econf.econf_freeFile(kf)
     return
