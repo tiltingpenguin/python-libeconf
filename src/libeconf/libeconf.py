@@ -57,7 +57,7 @@ libname = ctypes.util.find_library("econf")
 econf = CDLL(libname)
 
 
-def econf_set_Value():
+def econf_setValue():
     pass
 
 
@@ -76,24 +76,50 @@ def econf_readFile(file_name: bytes, delim: bytes, comment: bytes):
     return result
 
 
-def econf_mergeFiles():
-    pass
+def econf_mergeFiles(usr_file, etc_file):
+    merged_file = c_void_p(None)
+    err = econf.econf_mergeFiles(byref(merged_file), usr_file, etc_file)
+    if err != 0:
+        print("mergeFiles: ", Econf_err(err))
+        return Econf_err(err)
+    return merged_file
 
 
-def econf_readDirs():
-    pass
+def econf_readDirs(usr_conf_dir, etc_conf_dir, project_name, config_suffix, delim, comment):
+    result = c_void_p(None)
+    c_usr_conf_dir = c_char_p(usr_conf_dir)
+    c_etc_conf_dir = c_char_p(etc_conf_dir)
+    c_project_name = c_char_p(project_name)
+    c_config_suffix = c_char_p(config_suffix)
+    err = econf.econf_readDirs(byref(result), c_usr_conf_dir, c_etc_conf_dir, c_project_name, c_config_suffix, delim, comment)
+    if err != 0:
+        print("readDirs: ", Econf_err(err))
+        return Econf_err(err)
+    return result
 
 
 def econf_readDirsHistory():
     pass
 
 
-def econf_newkeyFile():
-    pass
+def econf_newkeyFile(delim, comment):
+    result = c_void_p(None)
+    c_delim = c_char(delim)
+    c_comment = c_char(comment)
+    err = econf.econf_newKeyFile(result, c_delim, c_comment)
+    if err != 0:
+        print("newKeyFile: ", Econf_err(err))
+        return Econf_err(err)
+    return result
 
 
 def econf_newIniFile():
-    pass
+    result = c_void_p(None)
+    err = econf.econf_newIniFile(result)
+    if err != 0:
+        print("newIniFile: ", Econf_err(err))
+        return Econf_err(err)
+    return result
 
 
 def econf_writeFile(kf, save_to_dir, file_name):
@@ -105,6 +131,7 @@ def econf_writeFile(kf, save_to_dir, file_name):
 
 def econf_getPath(kf):
     # extract from pointer
+    econf.econf_getPath.restype = c_char_p
     return econf.econf_getPath(kf)
 
 
@@ -413,13 +440,23 @@ def econf_setBoolValue(kf, group, key, value):
     return Econf_err(err)
 
 
-def econf_errString():
+def econf_errString(error):
+    c_int(error)
+    econf.econf_errString.restype = c_char_p
+    return econf.econf_errString(error)
+
+
+def econf_errLocation(filename, line_nr):
+    c_filename = c_char_p(filename)
+    c_line_nr = c_uint64(line_nr)
+    econf.econf_errLocation(byref(c_filename), byref(c_line_nr))
+    return c_filename.value, c_line_nr.value
+
+
+def econf_freeArray(arr: list):
     pass
 
 
-def econf_freeArray():
-    pass
-
-
-def econf_freeFile():
-    pass
+def econf_freeFile(kf):
+    econf.econf_freeFile(kf)
+    return
