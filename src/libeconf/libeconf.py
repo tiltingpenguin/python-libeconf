@@ -333,40 +333,84 @@ def econf_getBoolValueDef(kf, group, key, default):
     return c_result.value
 
 
-def econf_setIntValue():
-    pass
+def econf_setIntValue(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_int32(value)
+    err = econf.econf_setIntValue(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setIntvalue: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setInt64Value():
-    pass
+def econf_setInt64Value(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_int64(value)
+    err = econf.econf_setInt64Value(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setInt64value: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setInt64value():
-    pass
+def econf_setUIntValue(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_uint32(value)
+    err = econf.econf_setUIntValue(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setUIntvalue: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setUIntValue():
-    pass
+def econf_setUInt64Value(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_uint64(value)
+    err = econf.econf_setUInt64Value(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setUInt64value: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setUInt64Value():
-    pass
+def econf_setFloatValue(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_float(value)
+    err = econf.econf_setFloatValue(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setFloatvalue: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setFloatValue():
-    pass
+def econf_setDoubleValue(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_double(value)
+    err = econf.econf_setDoubleValue(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setDoublevalue: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setDoubleValue():
-    pass
+def econf_setStringValue(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_char_p(value)
+    err = econf.econf_setStringValue(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setStringvalue: ", Econf_err(err))
+    return Econf_err(err)
 
 
-def econf_setStringValue():
-    pass
-
-
-def econf_setBoolValue():
-    pass
+def econf_setBoolValue(kf, group, key, value):
+    c_group = c_char_p(group)
+    c_key = c_char_p(key)
+    c_value = c_bool(value)
+    err = econf.econf_setBoolValue(kf, c_group, c_key, c_value)
+    if err != 0:
+        print("setBoolvalue: ", Econf_err(err))
+    return Econf_err(err)
 
 
 def econf_errString():
