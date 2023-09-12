@@ -1,6 +1,7 @@
 import ctypes.util
 from enum import Enum
 import pathlib
+from typing import *
 from ctypes import *
 
 
@@ -57,12 +58,24 @@ libname = ctypes.util.find_library("econf")
 econf = CDLL(libname)
 
 
-def econf_setValue():
-    pass
-
-
-def econf_free():
-    pass
+def econf_setValue(kf, group, key, value):
+    if isinstance(value, int):
+        res = econf_setIntValue(kf, group, key, value)
+    # elif isinstance(value, long):
+    #     res = econf_setInt64Value(kf, group, key, value)
+    # elif isinstance(value, uint):
+    #     res = econf_setUIntValue(kf, group, key, value)
+    # elif isinstance(value, ulong):
+    #     res = econf_setUInt64Value(kf, group, key, value)
+    elif isinstance(value, float):
+        res = econf_setFloatValue(kf, group, key, value)
+    # elif isinstance(value, double):
+    #     res = econf_setDoubleValue(kf, group, key, value
+    elif isinstance(value, str):
+        res = econf_setStringValue(kf, group, key, value)
+    elif isinstance(value, bool):
+        res = econf_setBoolValue(kf, group, key, value)
+    return res
 
 
 def econf_readFile(file_name: bytes, delim: bytes, comment: bytes):
@@ -85,6 +98,7 @@ def econf_mergeFiles(usr_file, etc_file):
     return merged_file
 
 
+# this reads either the first OR the second file if the first one does not exist
 def econf_readDirs(usr_conf_dir, etc_conf_dir, project_name, config_suffix, delim, comment):
     result = c_void_p(None)
     c_usr_conf_dir = c_char_p(usr_conf_dir)
@@ -97,9 +111,21 @@ def econf_readDirs(usr_conf_dir, etc_conf_dir, project_name, config_suffix, deli
         return Econf_err(err)
     return result
 
-
-def econf_readDirsHistory():
-    pass
+# this reads either the first OR the second file if the first one does not exist
+def econf_readDirsHistory(usr_conf_dir, etc_conf_dir, project_name, config_suffix, delim, comment):
+    key_files = c_void_p(None)
+    c_size = c_size_t()
+    c_usr_conf_dir = c_char_p(usr_conf_dir)
+    c_etc_conf_dir = c_char_p(etc_conf_dir)
+    c_project_name = c_char_p(project_name)
+    c_config_suffix = c_char_p(config_suffix)
+    err = econf.econf_readDirsHistory(byref(key_files), byref(c_size), c_usr_conf_dir, c_etc_conf_dir, c_project_name, c_config_suffix, delim, comment)
+    if err != 0:
+        print("readDirsHistory: ", Econf_err(err))
+        return Econf_err(err)
+    arr = cast(key_files, POINTER(c_void_p * c_size.value))
+    result = [c_void_p(i) for i in arr.contents]
+    return result
 
 
 def econf_newkeyFile(delim, comment):
