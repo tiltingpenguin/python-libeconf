@@ -29,426 +29,454 @@ class Econf_err(Enum):
     ECONF_PARSING_CALLBACK_FAILED = 21
 
 
+def _exceptions(err: int, val: str):
+    if err == 1:
+        raise Exception(val)
+    elif err == 2:
+        raise MemoryError(val)
+    elif err == 3:
+        raise FileNotFoundError(val)
+    elif err == 4:
+        raise KeyError(val)
+    elif err == 5:
+        raise KeyError(val)
+    elif err == 6:
+        raise KeyError(val)
+    elif err == 7:
+        raise OSError(val)
+    elif err == 8:
+        raise Exception(val)
+    elif err == 9:
+        raise SyntaxError(val)
+    elif err == 10:
+        raise SyntaxError(val)
+    elif err == 11:
+        raise SyntaxError(val)
+    elif err == 12:
+        raise SyntaxError(val)
+    elif err == 13:
+        raise ValueError(val)
+    elif err == 14:
+        raise ValueError(val)
+    elif err == 15:
+        raise ValueError(val)
+    elif err == 16:
+        raise PermissionError(val)
+    elif err == 17:
+        raise PermissionError(val)
+    elif err == 18:
+        raise PermissionError(val)
+    elif err == 19:
+        raise PermissionError(val)
+    elif err == 20:
+        raise FileNotFoundError(val)
+    elif err == 21:
+        raise Exception(val)
+    else:
+        raise Exception(val)
+
+
+def _encode_str(string: str | bytes) -> bytes:
+    if isinstance(string, str):
+        string = string.encode("utf-8")
+    elif not isinstance(string, bytes):
+        raise TypeError("Input must be a string or bytes")
+    return string
+
+
+def _check_int_overflow(val: int) -> bool:
+    if isinstance(val, int):
+        c_val = c_int64(val)
+        return c_val.value == val
+    else:
+        raise TypeError("parameter is not a nteger")
+
+
+def _check_uint_overflow(val: int) -> bool:
+    if isinstance(val, int) & (val >= 0):
+        c_val = c_uint64(val)
+        return c_val.value == val
+    else:
+        raise TypeError("parameter is not a unsigned integer")
+
+
+def _check_float_overflow(val: float) -> bool:
+    if isinstance(val, float):
+        c_val = c_double(val)
+        return c_val.value == val
+    else:
+        raise TypeError("parameter is not a float")
+
+
 libname = ctypes.util.find_library("econf")
 libeconf = CDLL(libname)
 
 
-def setValue(kf, group, key, value):
+def set_value(kf: c_void_p, group: str | bytes, key: str | bytes, value: Any) -> Econf_err:
     if isinstance(value, int):
-        res = set_int_value(kf, group, key, value)
-    # elif isinstance(value, long):
-    #     res = econf_setInt64Value(kf, group, key, value)
-    # elif isinstance(value, uint):
-    #     res = econf_setUIntValue(kf, group, key, value)
-    # elif isinstance(value, ulong):
-    #     res = econf_setUInt64Value(kf, group, key, value)
+        if value >= 0:
+            res = set_uint_value(kf, group, key, value)
+        else:
+            set_int_value(kf, group, key, value)
     elif isinstance(value, float):
         res = set_float_value(kf, group, key, value)
-    # elif isinstance(value, double):
-    #     res = econf_setDoubleValue(kf, group, key, value
-    elif isinstance(value, str):
+    elif isinstance(value, str) | isinstance(value, bytes):
         res = set_string_value(kf, group, key, value)
     elif isinstance(value, bool):
         res = set_bool_value(kf, group, key, value)
+    else:
+        raise TypeError("'value' parameter is not one of the supported types")
     return res
 
 
-def read_file(file_name: bytes, delim: bytes, comment: bytes):
+def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) -> c_void_p:
     # return Pointer to object, no need to parse it
     result = c_void_p(None)
+    file_name = _encode_str(file_name)
+    delim = _encode_str(delim)
+    comment = _encode_str(comment)
     err = libeconf.econf_readFile(byref(result), file_name, delim, comment)
-    if err != 0:
-        print("readFile: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        raise _exceptions(err, f"read_file failed with error: {err_string(err)}")
     return result
 
 
-def merge_files(usr_file, etc_file):
+def merge_files(usr_file: c_void_p, etc_file: c_void_p) -> c_void_p:
     merged_file = c_void_p(None)
     err = libeconf.econf_mergeFiles(byref(merged_file), usr_file, etc_file)
-    if err != 0:
-        print("mergeFiles: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        raise _exceptions(err, f"merge_files failed with error: {err_string(err)}")
     return merged_file
 
 
 # this reads either the first OR the second file if the first one does not exist
-def read_dirs(usr_conf_dir, etc_conf_dir, project_name, config_suffix, delim, comment):
+def read_dirs(
+    usr_conf_dir: str | bytes,
+    etc_conf_dir: str | bytes,
+    project_name: str | bytes,
+    config_suffix: str | bytes,
+    delim: str | bytes,
+    comment: str | bytes,
+) -> c_void_p:
     result = c_void_p(None)
-    c_usr_conf_dir = c_char_p(usr_conf_dir)
-    c_etc_conf_dir = c_char_p(etc_conf_dir)
-    c_project_name = c_char_p(project_name)
-    c_config_suffix = c_char_p(config_suffix)
-    err = libeconf.econf_readDirs(byref(result), c_usr_conf_dir, c_etc_conf_dir, c_project_name, c_config_suffix, delim, comment)
-    if err != 0:
-        print("readDirs: ", Econf_err(err))
-        return Econf_err(err)
+    c_usr_conf_dir = _encode_str(usr_conf_dir)
+    c_etc_conf_dir = _encode_str(etc_conf_dir)
+    c_project_name = _encode_str(project_name)
+    c_config_suffix = _encode_str(config_suffix)
+    err = libeconf.econf_readDirs(
+        byref(result),
+        c_usr_conf_dir,
+        c_etc_conf_dir,
+        c_project_name,
+        c_config_suffix,
+        delim,
+        comment,
+    )
+    if err:
+        raise _exceptions(err, f"read_dirs failed with error: {err_string(err)}")
     return result
 
 
 # this reads either the first OR the second file if the first one does not exist
-def read_dirs_history(usr_conf_dir, etc_conf_dir, project_name, config_suffix, delim, comment):
+def read_dirs_history(
+    usr_conf_dir: str | bytes,
+    etc_conf_dir: str | bytes,
+    project_name: str | bytes,
+    config_suffix: str | bytes,
+    delim: str | bytes,
+    comment: str | bytes,
+) -> list[c_void_p]:
     key_files = c_void_p(None)
     c_size = c_size_t()
-    c_usr_conf_dir = c_char_p(usr_conf_dir)
-    c_etc_conf_dir = c_char_p(etc_conf_dir)
-    c_project_name = c_char_p(project_name)
-    c_config_suffix = c_char_p(config_suffix)
-    err = libeconf.econf_readDirsHistory(byref(key_files), byref(c_size), c_usr_conf_dir, c_etc_conf_dir, c_project_name, c_config_suffix, delim, comment)
-    if err != 0:
-        print("readDirsHistory: ", Econf_err(err))
-        return Econf_err(err)
+    c_usr_conf_dir = _encode_str(usr_conf_dir)
+    c_etc_conf_dir = _encode_str(etc_conf_dir)
+    c_project_name = _encode_str(project_name)
+    c_config_suffix = _encode_str(config_suffix)
+    err = libeconf.econf_readDirsHistory(
+        byref(key_files),
+        byref(c_size),
+        c_usr_conf_dir,
+        c_etc_conf_dir,
+        c_project_name,
+        c_config_suffix,
+        delim,
+        comment,
+    )
+    if err:
+        raise _exceptions(
+            err, f"read_dirs_history failed with error: {err_string(err)}"
+        )
     arr = cast(key_files, POINTER(c_void_p * c_size.value))
     result = [c_void_p(i) for i in arr.contents]
     return result
 
 
-def new_key_file(delim, comment):
+def new_key_file(delim: str | bytes, comment: str | bytes) -> c_void_p:
     result = c_void_p(None)
-    c_delim = c_char(delim)
-    c_comment = c_char(comment)
-    err = libeconf.econf_newKeyFile(result, c_delim, c_comment)
-    if err != 0:
-        print("newKeyFile: ", Econf_err(err))
-        return Econf_err(err)
+    delim = _encode_str(delim)
+    comment = _encode_str(comment)
+    err = libeconf.econf_newKeyFile(result, delim, comment)
+    if err:
+        raise _exceptions(err, f"new_key_file failed with error: {err_string(err)}")
     return result
 
 
-def new_ini_file():
+def new_ini_file() -> c_void_p:
     result = c_void_p(None)
     err = libeconf.econf_newIniFile(result)
-    if err != 0:
-        print("newIniFile: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        raise _exceptions(err, f"new_ini_file failed with error: {err_string(err)}")
     return result
 
 
-def write_file(kf, save_to_dir, file_name):
-    c_save_to_dir = c_char_p(save_to_dir)
-    c_file_name = c_char_p(file_name)
+def write_file(kf: c_void_p, save_to_dir: str, file_name: str) -> Econf_err:
+    c_save_to_dir = _encode_str(save_to_dir)
+    c_file_name = _encode_str(file_name)
     err = libeconf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
-    return err
+    return Econf_err(err)
 
 
-def get_path(kf):
+def get_path(kf: c_void_p) -> str:
     # extract from pointer
     libeconf.econf_getPath.restype = c_char_p
-    return libeconf.econf_getPath(kf)
+    return libeconf.econf_getPath(kf).decode("utf-8")
 
 
-def get_groups(kf):
+def get_groups(kf: c_void_p) -> list[str]:
     c_length = c_size_t()
     c_groups = c_void_p(None)
     err = libeconf.econf_getGroups(kf, byref(c_length), byref(c_groups))
-    if err != 0:
-        print("getGroups: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        _exceptions(err, f"get_groups failed with error: {err_string(err)}")
     arr = cast(c_groups, POINTER(c_char_p * c_length.value))
-    result = [i for i in arr.contents]
+    result = [i.decode("utf-8") for i in arr.contents]
     return result
 
 
 # Not passing a group currently leads to ECONF_NOKEY error
-def get_keys(kf, group=None):
+def get_keys(kf: c_void_p, group: str) -> list[str]:
     c_length = c_size_t()
     c_keys = c_void_p(None)
+    group = _encode_str(group)
     err = libeconf.econf_getKeys(kf, group, byref(c_length), byref(c_keys))
-    if err != 0:
-        print("getKeys: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        _exceptions(err, f"get_keys failed with error: {err_string(err)}")
     arr = cast(c_keys, POINTER(c_char_p * c_length.value))
-    result = [i for i in arr.contents]
+    result = [i.decode("utf-8") for i in arr.contents]
     return result
 
 
-def get_int_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_result = c_int32()
-    err = libeconf.econf_getIntValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getIntValue: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
-
-
-def get_int64_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_int_value(kf: c_void_p, group: str, key: str) -> int:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_int64()
     err = libeconf.econf_getInt64Value(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getInt64Value: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        _exceptions(err, f"get_int64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_uint_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_result = c_uint32()
-    err = libeconf.econf_getUIntValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getUIntValue: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
-
-
-def get_uint64_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_uint_value(kf: c_void_p, group: str, key: str) -> int:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_uint64()
     err = libeconf.econf_getUInt64Value(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getUInt64Value: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        _exceptions(err, f"get_uint64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_float_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_result = c_float()
-    err = libeconf.econf_getFloatValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getFloatValue: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
-
-
-def get_double_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_float_value(kf: c_void_p, group: str, key: str) -> float:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_double()
     err = libeconf.econf_getDoubleValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getDoubleValue: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        _exceptions(err, f"get_double_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_string_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_string_value(kf: c_void_p, group: str, key: str) -> str:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_char_p()
     err = libeconf.econf_getStringValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getStringValue: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
+    if err:
+        _exceptions(err, f"get_string_value failed with error: {err_string(err)}")
+    return c_result.value.decode("utf-8")
 
 
-def get_bool_value(kf, group, key):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_bool_value(kf: c_void_p, group: str, key: str) -> bool:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_bool()
     err = libeconf.econf_getBoolValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        print("getBoolValue: ", Econf_err(err))
-        return Econf_err(err)
+    if err:
+        _exceptions(err, f"get_bool_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_int_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_result = c_int32()
-    c_default = c_int32(default)
-    err = libeconf.econf_getIntValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
-        if err == 5:
-            return c_default.value
-        print("getIntValueDef: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
-
-
-def get_int64_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_int64()
+    if not isinstance(default, int):
+        raise TypeError(f"\"default\" parameter must be of type int")
+    if not _check_int_overflow(default):
+        raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_default = c_int64(default)
-    err = libeconf.econf_getInt64ValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
+    err = libeconf.econf_getInt64ValueDef(
+        kf, c_group, c_key, byref(c_result), c_default
+    )
+    if err:
         if err == 5:
             return c_default.value
-        print("getInt64ValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        _exceptions(err, f"get_int64_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_uint_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_result = c_uint32()
-    c_default = c_uint32(default)
-    err = libeconf.econf_getUIntValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
-        if err == 5:
-            return c_default.value
-        print("getUIntValueDef: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
-
-
-def get_uint64_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_uint64()
+    if not isinstance(default, int) | (default < 0):
+        raise TypeError(f"\"default\" parameter must be of type int and greater or equal to zero")
+    if not _check_uint_overflow(default):
+        raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_default = c_uint64(default)
-    err = libeconf.econf_getUInt64ValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
+    err = libeconf.econf_getUInt64ValueDef(
+        kf, c_group, c_key, byref(c_result), c_default
+    )
+    if err:
         if err == 5:
             return c_default.value
-        print("getUInt64ValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        _exceptions(err, f"get_uint64_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_float_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_result = c_float()
-    c_default = c_float(default)
-    err = libeconf.econf_getFloatValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
-        if err == 5:
-            return c_default.value
-        print("getFloatValueDef: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
-
-
-def get_double_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> float:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_double()
+    if not isinstance(default, float):
+        raise TypeError(f"\"default\" parameter must be of type float")
+    if not _check_float_overflow(default):
+        raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_default = c_double(default)
-    err = libeconf.econf_getDoubleValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
+    err = libeconf.econf_getDoubleValueDef(
+        kf, c_group, c_key, byref(c_result), c_default
+    )
+    if err:
         if err == 5:
             return c_default.value
-        print("getDoubleValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        _exceptions(err, f"get_double_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_string_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_string_value_def(kf: c_void_p, group: str, key: str, default: str) -> str:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_char_p()
-    c_default = c_char_p(default)
-    err = libeconf.econf_getStringValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
+    c_default = _encode_str(default)
+    err = libeconf.econf_getStringValueDef(
+        kf, c_group, c_key, byref(c_result), c_default
+    )
+    if err:
         if err == 5:
-            return c_default.value
-        print("getStringValueDef: ", Econf_err(err))
-        return Econf_err(err)
-    return c_result.value
+            return c_default.decode("utf-8")
+        _exceptions(err, f"get_string_value_def failed with error: {err_string(err)}")
+    return c_result.value.decode("utf-8")
 
 
-def get_bool_value_def(kf, group, key, default):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> bool:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
     c_result = c_bool()
+    if not isinstance(default, bool):
+        raise TypeError(f"\"value\" parameter must be of type bool")
     c_default = c_bool(default)
     err = libeconf.econf_getBoolValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
+    if err:
         if err == 5:
             return c_default.value
-        print("getBoolValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        _exceptions(err, f"get_bool_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
-def set_int_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_value = c_int32(value)
-    err = libeconf.econf_setIntValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setIntvalue: ", Econf_err(err))
-    return Econf_err(err)
-
-
-def set_int64_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def set_int_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
+    if not isinstance(value, int):
+        raise TypeError(f"\"value\" parameter must be of type int")
+    if not _check_int_overflow(value):
+        raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_value = c_int64(value)
     err = libeconf.econf_setInt64Value(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setInt64value: ", Econf_err(err))
+    if err:
+        _exceptions(err, f"set_int64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_uint_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_value = c_uint32(value)
-    err = libeconf.econf_setUIntValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setUIntvalue: ", Econf_err(err))
-    return Econf_err(err)
-
-
-def set_uint64_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def set_uint_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
+    if not isinstance(value, int) | (value < 0):
+        raise TypeError(f"\"value\" parameter must be of type int and be greater or equal to zero")
+    if not _check_uint_overflow(value):
+        raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_value = c_uint64(value)
     err = libeconf.econf_setUInt64Value(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setUInt64value: ", Econf_err(err))
+    if err:
+        _exceptions(err, f"set_uint64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_float_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_value = c_float(value)
-    err = libeconf.econf_setFloatValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setFloatvalue: ", Econf_err(err))
-    return Econf_err(err)
-
-
-def set_double_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def set_float_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_err:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
+    if not isinstance(value, float):
+        raise TypeError(f"\"value\" parameter must be of type float")
+    if not _check_float_overflow(value):
+        raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_value = c_double(value)
     err = libeconf.econf_setDoubleValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setDoublevalue: ", Econf_err(err))
+    if err:
+        _exceptions(err, f"set_double_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_string_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
-    c_value = c_char_p(value)
+def set_string_value(kf: c_void_p, group: str, key: str, value: str | bytes) -> Econf_err:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
+    c_value = _encode_str(value)
     err = libeconf.econf_setStringValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setStringvalue: ", Econf_err(err))
+    if err:
+        _exceptions(err, f"set_string_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_bool_value(kf, group, key, value):
-    c_group = c_char_p(group)
-    c_key = c_char_p(key)
+def set_bool_value(kf: c_void_p, group: str, key: str, value: bool) -> Econf_err:
+    c_group = _encode_str(group)
+    c_key = _encode_str(key)
+    if not isinstance(value, bool):
+        raise TypeError(f"\"value\" parameter must be of type bool")
     c_value = c_bool(value)
     err = libeconf.econf_setBoolValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        print("setBoolvalue: ", Econf_err(err))
+    if err:
+        _exceptions(err, f"set_bool_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def err_string(error):
+def err_string(error: int):
+    if not isinstance(error, int):
+        raise TypeError("Error codes must be of type int")
     c_int(error)
     libeconf.econf_errString.restype = c_char_p
-    return libeconf.econf_errString(error)
+    return libeconf.econf_errString(error).decode("utf-8")
 
 
-def err_location(filename, line_nr):
-    c_filename = c_char_p(filename)
+def err_location(filename: str, line_nr: int):
+    c_filename = c_char_p(_encode_str(filename))
     c_line_nr = c_uint64(line_nr)
     libeconf.econf_errLocation(byref(c_filename), byref(c_line_nr))
     return c_filename.value, c_line_nr.value
