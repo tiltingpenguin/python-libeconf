@@ -29,11 +29,56 @@ class Econf_err(Enum):
     ECONF_PARSING_CALLBACK_FAILED = 21
 
 
+def exceptions(err, val):
+    if err == 1:
+        raise Exception(val)
+    elif err == 2:
+        raise MemoryError(val)
+    elif err == 3:
+        raise FileNotFoundError(val)
+    elif err == 4:
+        raise KeyError(val)
+    elif err == 5:
+        raise KeyError(val)
+    elif err == 6:
+        raise KeyError(val)
+    elif err == 7:
+        raise OSError(val)
+    elif err == 8:
+        raise Exception(val)
+    elif err == 9:
+        raise SyntaxError(val)
+    elif err == 10:
+        raise SyntaxError(val)
+    elif err == 11:
+        raise SyntaxError(val)
+    elif err == 12:
+        raise SyntaxError(val)
+    elif err == 13:
+        raise ValueError(val)
+    elif err == 14:
+        raise ValueError(val)
+    elif err == 15:
+        raise ValueError(val)
+    elif err == 16:
+        raise PermissionError(val)
+    elif err == 17:
+        raise PermissionError(val)
+    elif err == 18:
+        raise PermissionError(val)
+    elif err == 19:
+        raise PermissionError(val)
+    elif err == 20:
+        raise FileNotFoundError(val)
+    elif err == 21:
+        raise Exception(val)
+
+
 libname = ctypes.util.find_library("econf")
 libeconf = CDLL(libname)
 
 
-def setValue(kf, group, key, value):
+def set_value(kf, group, key, value):
     if isinstance(value, int):
         res = set_int_value(kf, group, key, value)
     # elif isinstance(value, long):
@@ -58,8 +103,7 @@ def read_file(file_name: bytes, delim: bytes, comment: bytes):
     result = c_void_p(None)
     err = libeconf.econf_readFile(byref(result), file_name, delim, comment)
     if err != 0:
-        print("readFile: ", Econf_err(err))
-        return Econf_err(err)
+        raise exceptions(err, f"read_file failed with error: {err_string(err)}")
     return result
 
 
@@ -67,8 +111,7 @@ def merge_files(usr_file, etc_file):
     merged_file = c_void_p(None)
     err = libeconf.econf_mergeFiles(byref(merged_file), usr_file, etc_file)
     if err != 0:
-        print("mergeFiles: ", Econf_err(err))
-        return Econf_err(err)
+        raise exceptions(err, f"merge_files failed with error: {err_string(err)}")
     return merged_file
 
 
@@ -81,8 +124,7 @@ def read_dirs(usr_conf_dir, etc_conf_dir, project_name, config_suffix, delim, co
     c_config_suffix = c_char_p(config_suffix)
     err = libeconf.econf_readDirs(byref(result), c_usr_conf_dir, c_etc_conf_dir, c_project_name, c_config_suffix, delim, comment)
     if err != 0:
-        print("readDirs: ", Econf_err(err))
-        return Econf_err(err)
+        raise exceptions(err, f"read_dirs failed with error: {err_string(err)}")
     return result
 
 
@@ -96,8 +138,7 @@ def read_dirs_history(usr_conf_dir, etc_conf_dir, project_name, config_suffix, d
     c_config_suffix = c_char_p(config_suffix)
     err = libeconf.econf_readDirsHistory(byref(key_files), byref(c_size), c_usr_conf_dir, c_etc_conf_dir, c_project_name, c_config_suffix, delim, comment)
     if err != 0:
-        print("readDirsHistory: ", Econf_err(err))
-        return Econf_err(err)
+        raise exceptions(err, f"read_dirs_history failed with error: {err_string(err)}")
     arr = cast(key_files, POINTER(c_void_p * c_size.value))
     result = [c_void_p(i) for i in arr.contents]
     return result
@@ -109,8 +150,7 @@ def new_key_file(delim, comment):
     c_comment = c_char(comment)
     err = libeconf.econf_newKeyFile(result, c_delim, c_comment)
     if err != 0:
-        print("newKeyFile: ", Econf_err(err))
-        return Econf_err(err)
+        raise exceptions(err, f"new_key_file failed with error: {err_string(err)}")
     return result
 
 
@@ -118,8 +158,7 @@ def new_ini_file():
     result = c_void_p(None)
     err = libeconf.econf_newIniFile(result)
     if err != 0:
-        print("newIniFile: ", Econf_err(err))
-        return Econf_err(err)
+        raise exceptions(err, f"new_ini_file failed with error: {err_string(err)}")
     return result
 
 
@@ -127,7 +166,7 @@ def write_file(kf, save_to_dir, file_name):
     c_save_to_dir = c_char_p(save_to_dir)
     c_file_name = c_char_p(file_name)
     err = libeconf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
-    return err
+    return Econf_err(err)
 
 
 def get_path(kf):
@@ -141,8 +180,7 @@ def get_groups(kf):
     c_groups = c_void_p(None)
     err = libeconf.econf_getGroups(kf, byref(c_length), byref(c_groups))
     if err != 0:
-        print("getGroups: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_groups failed with error: {err_string(err)}")
     arr = cast(c_groups, POINTER(c_char_p * c_length.value))
     result = [i for i in arr.contents]
     return result
@@ -154,8 +192,7 @@ def get_keys(kf, group=None):
     c_keys = c_void_p(None)
     err = libeconf.econf_getKeys(kf, group, byref(c_length), byref(c_keys))
     if err != 0:
-        print("getKeys: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_keys failed with error: {err_string(err)}")
     arr = cast(c_keys, POINTER(c_char_p * c_length.value))
     result = [i for i in arr.contents]
     return result
@@ -167,8 +204,7 @@ def get_int_value(kf, group, key):
     c_result = c_int32()
     err = libeconf.econf_getIntValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getIntValue: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_int_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -178,8 +214,7 @@ def get_int64_value(kf, group, key):
     c_result = c_int64()
     err = libeconf.econf_getInt64Value(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getInt64Value: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_int64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -189,8 +224,7 @@ def get_uint_value(kf, group, key):
     c_result = c_uint32()
     err = libeconf.econf_getUIntValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getUIntValue: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_uint_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -200,8 +234,7 @@ def get_uint64_value(kf, group, key):
     c_result = c_uint64()
     err = libeconf.econf_getUInt64Value(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getUInt64Value: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_uint64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -211,8 +244,7 @@ def get_float_value(kf, group, key):
     c_result = c_float()
     err = libeconf.econf_getFloatValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getFloatValue: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_float_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -222,8 +254,7 @@ def get_double_value(kf, group, key):
     c_result = c_double()
     err = libeconf.econf_getDoubleValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getDoubleValue: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_double_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -233,8 +264,7 @@ def get_string_value(kf, group, key):
     c_result = c_char_p()
     err = libeconf.econf_getStringValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getStringValue: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_string_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -244,8 +274,7 @@ def get_bool_value(kf, group, key):
     c_result = c_bool()
     err = libeconf.econf_getBoolValue(kf, c_group, c_key, byref(c_result))
     if err != 0:
-        print("getBoolValue: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_bool_value failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -258,8 +287,7 @@ def get_int_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getIntValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_int_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -272,8 +300,7 @@ def get_int64_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getInt64ValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_int64_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -286,8 +313,7 @@ def get_uint_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getUIntValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_uint_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -300,8 +326,7 @@ def get_uint64_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getUInt64ValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_uint64_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -314,8 +339,7 @@ def get_float_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getFloatValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_float_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -328,8 +352,7 @@ def get_double_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getDoubleValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_double_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -342,8 +365,7 @@ def get_string_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getStringValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_string_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -356,8 +378,7 @@ def get_bool_value_def(kf, group, key, default):
     if err != 0:
         if err == 5:
             return c_default.value
-        print("getBoolValueDef: ", Econf_err(err))
-        return Econf_err(err)
+        exceptions(err, f"get_bool_value_def failed with error: {err_string(err)}")
     return c_result.value
 
 
@@ -367,7 +388,7 @@ def set_int_value(kf, group, key, value):
     c_value = c_int32(value)
     err = libeconf.econf_setIntValue(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setIntvalue: ", Econf_err(err))
+        exceptions(err, f"set_int_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -377,7 +398,7 @@ def set_int64_value(kf, group, key, value):
     c_value = c_int64(value)
     err = libeconf.econf_setInt64Value(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setInt64value: ", Econf_err(err))
+        exceptions(err, f"set_int64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -387,7 +408,7 @@ def set_uint_value(kf, group, key, value):
     c_value = c_uint32(value)
     err = libeconf.econf_setUIntValue(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setUIntvalue: ", Econf_err(err))
+        exceptions(err, f"set_uint_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -397,7 +418,7 @@ def set_uint64_value(kf, group, key, value):
     c_value = c_uint64(value)
     err = libeconf.econf_setUInt64Value(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setUInt64value: ", Econf_err(err))
+        exceptions(err, f"set_uint64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -407,7 +428,7 @@ def set_float_value(kf, group, key, value):
     c_value = c_float(value)
     err = libeconf.econf_setFloatValue(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setFloatvalue: ", Econf_err(err))
+        exceptions(err, f"set_float_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -417,7 +438,7 @@ def set_double_value(kf, group, key, value):
     c_value = c_double(value)
     err = libeconf.econf_setDoubleValue(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setDoublevalue: ", Econf_err(err))
+        exceptions(err, f"set_double_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -427,7 +448,7 @@ def set_string_value(kf, group, key, value):
     c_value = c_char_p(value)
     err = libeconf.econf_setStringValue(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setStringvalue: ", Econf_err(err))
+        exceptions(err, f"set_string_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
@@ -437,7 +458,7 @@ def set_bool_value(kf, group, key, value):
     c_value = c_bool(value)
     err = libeconf.econf_setBoolValue(kf, c_group, c_key, c_value)
     if err != 0:
-        print("setBoolvalue: ", Econf_err(err))
+        exceptions(err, f"set_bool_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
