@@ -117,7 +117,7 @@ def set_value(kf: c_void_p, group: str | bytes, key: str | bytes, value: Any) ->
         if value >= 0:
             res = set_uint_value(kf, group, key, value)
         else:
-            set_int_value(kf, group, key, value)
+            res = set_int_value(kf, group, key, value)
     elif isinstance(value, float):
         res = set_float_value(kf, group, key, value)
     elif isinstance(value, str) | isinstance(value, bytes):
