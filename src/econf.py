@@ -241,13 +241,7 @@ def get_keys(kf: c_void_p, group: str) -> list[str]:
 
 
 def get_int_value(kf: c_void_p, group: str, key: str) -> int:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    c_result = c_int32()
-    err = libeconf.econf_getIntValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        _exceptions(err, f"get_int_value failed with error: {err_string(err)}")
-    return c_result.value
+    return get_int64_value(kf, group, key)
 
 
 def get_int64_value(kf: c_void_p, group: str, key: str) -> int:
@@ -261,13 +255,7 @@ def get_int64_value(kf: c_void_p, group: str, key: str) -> int:
 
 
 def get_uint_value(kf: c_void_p, group: str, key: str) -> int:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    c_result = c_uint32()
-    err = libeconf.econf_getUIntValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        _exceptions(err, f"get_uint_value failed with error: {err_string(err)}")
-    return c_result.value
+    return get_uint64_value(kf, group, key)
 
 
 def get_uint64_value(kf: c_void_p, group: str, key: str) -> int:
@@ -281,13 +269,7 @@ def get_uint64_value(kf: c_void_p, group: str, key: str) -> int:
 
 
 def get_float_value(kf: c_void_p, group: str, key: str) -> float:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    c_result = c_float()
-    err = libeconf.econf_getFloatValue(kf, c_group, c_key, byref(c_result))
-    if err != 0:
-        _exceptions(err, f"get_float_value failed with error: {err_string(err)}")
-    return c_result.value
+    return get_double_value(kf, group, key)
 
 
 def get_double_value(kf: c_void_p, group: str, key: str) -> float:
@@ -321,20 +303,7 @@ def get_bool_value(kf: c_void_p, group: str, key: str) -> bool:
 
 
 def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    c_result = c_int32()
-    if not isinstance(default, int):
-        raise TypeError(f"\"default\" parameter must be of type int")
-    if sys.getsizeof(default) > 28:
-        raise TypeError(f"For 64 bit Integers use the get_int64_value_def")
-    c_default = c_int32(default)
-    err = libeconf.econf_getIntValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
-        if err == 5:
-            return c_default.value
-        _exceptions(err, f"get_int_value_def failed with error: {err_string(err)}")
-    return c_result.value
+    return get_int64_value_def(kf, group, key, default)
 
 
 def get_int64_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
@@ -355,20 +324,7 @@ def get_int64_value_def(kf: c_void_p, group: str, key: str, default: int) -> int
 
 
 def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    c_result = c_uint32()
-    if not isinstance(default, int) | (default < 0):
-        raise TypeError(f"\"default\" parameter must be of type int and greater or equal to zero")
-    if sys.getsizeof(default) > 28:
-        raise TypeError(f"For 64 bit Integers use the get_uint64_value_def")
-    c_default = c_uint32(default)
-    err = libeconf.econf_getUIntValueDef(kf, c_group, c_key, byref(c_result), c_default)
-    if err != 0:
-        if err == 5:
-            return c_default.value
-        _exceptions(err, f"get_uint_value_def failed with error: {err_string(err)}")
-    return c_result.value
+    return get_uint64_value_def(kf, group, key, default)
 
 
 def get_uint64_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
@@ -389,21 +345,7 @@ def get_uint64_value_def(kf: c_void_p, group: str, key: str, default: int) -> in
 
 
 def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> float:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    c_result = c_float()
-    if not isinstance(default, float):
-        raise TypeError(f"\"default\" parameter must be of type float")
-    # add check for 64 bit floats
-    c_default = c_float(default)
-    err = libeconf.econf_getFloatValueDef(
-        kf, c_group, c_key, byref(c_result), c_default
-    )
-    if err != 0:
-        if err == 5:
-            return c_default.value
-        _exceptions(err, f"get_float_value_def failed with error: {err_string(err)}")
-    return c_result.value
+    return get_double_value_def(kf, group, key, default)
 
 
 def get_double_value_def(kf: c_void_p, group: str, key: str, default: float) -> float:
@@ -454,17 +396,7 @@ def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> boo
 
 
 def set_int_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    if not isinstance(value, int):
-        raise TypeError(f"\"value\" parameter must be of type int")
-    if sys.getsizeof(value) > 28:
-        raise TypeError(f"For 64 bit Integers use the set_int64_value_def")
-    c_value = c_int32(value)
-    err = libeconf.econf_setIntValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        _exceptions(err, f"set_int_value failed with error: {err_string(err)}")
-    return Econf_err(err)
+    return set_int64_value(kf, group, key, value)
 
 
 def set_int64_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
@@ -480,17 +412,7 @@ def set_int64_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err
 
 
 def set_uint_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    if not isinstance(value, int) | (value < 0):
-        raise TypeError(f"\"value\" parameter must be of type int and be greater or equal to zero")
-    if sys.getsizeof(value) > 28:
-        raise TypeError(f"For 64 bit Integers use the set_uint64_value_def")
-    c_value = c_uint32(value)
-    err = libeconf.econf_setUIntValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        _exceptions(err, f"set_uint_value failed with error: {err_string(err)}")
-    return Econf_err(err)
+    return set_uint64_value(kf, group, key, value)
 
 
 def set_uint64_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
@@ -506,16 +428,7 @@ def set_uint64_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_er
 
 
 def set_float_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_err:
-    c_group = c_char_p(_encode_str(group))
-    c_key = c_char_p(_encode_str(key))
-    if not isinstance(value, float):
-        raise TypeError(f"\"value\" parameter must be of type float")
-    # add check for 64 bit floats
-    c_value = c_float(value)
-    err = libeconf.econf_setFloatValue(kf, c_group, c_key, c_value)
-    if err != 0:
-        _exceptions(err, f"set_float_value failed with error: {err_string(err)}")
-    return Econf_err(err)
+    return set_double_value(kf, group, key, value)
 
 
 def set_double_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_err:
