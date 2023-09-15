@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API &mdash; python-econf 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            python-econf
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#functions-to-interact-with-config-files">Functions to interact with config files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.new_key_file"><code class="docutils literal notranslate"><span class="pre">new_key_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.new_ini_file"><code class="docutils literal notranslate"><span class="pre">new_ini_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.merge_files"><code class="docutils literal notranslate"><span class="pre">merge_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.read_dirs"><code class="docutils literal notranslate"><span class="pre">read_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.read_dirs_history"><code class="docutils literal notranslate"><span class="pre">read_dirs_history()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.write_file"><code class="docutils literal notranslate"><span class="pre">write_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions-for-getting-values">Functions for getting values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_groups"><code class="docutils literal notranslate"><span class="pre">get_groups()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_keys"><code class="docutils literal notranslate"><span class="pre">get_keys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_int_value"><code class="docutils literal notranslate"><span class="pre">get_int_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_uint_value"><code class="docutils literal notranslate"><span class="pre">get_uint_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_float_value"><code class="docutils literal notranslate"><span class="pre">get_float_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_string_value"><code class="docutils literal notranslate"><span class="pre">get_string_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_bool_value"><code class="docutils literal notranslate"><span class="pre">get_bool_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions-for-getting-values-with-defaults">Functions for getting values with defaults</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_int_value_def"><code class="docutils literal notranslate"><span class="pre">get_int_value_def()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_uint_value_def"><code class="docutils literal notranslate"><span class="pre">get_uint_value_def()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_float_value_def"><code class="docutils literal notranslate"><span class="pre">get_float_value_def()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_string_value_def"><code class="docutils literal notranslate"><span class="pre">get_string_value_def()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_bool_value_def"><code class="docutils literal notranslate"><span class="pre">get_bool_value_def()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions-for-setting-values">Functions for setting values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_int_value"><code class="docutils literal notranslate"><span class="pre">set_int_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_uint_value"><code class="docutils literal notranslate"><span class="pre">set_uint_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_float_value"><code class="docutils literal notranslate"><span class="pre">set_float_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_string_value"><code class="docutils literal notranslate"><span class="pre">set_string_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_bool_value"><code class="docutils literal notranslate"><span class="pre">set_bool_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions-for-memory-management">Functions for memory management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.free_file"><code class="docutils literal notranslate"><span class="pre">free_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions-for-handling-error-codes">Functions for handling error codes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.err_string"><code class="docutils literal notranslate"><span class="pre">err_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.err_location"><code class="docutils literal notranslate"><span class="pre">err_location()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">python-econf</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Link to this heading"></a></h1>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+</tbody>
+</table>
+<section id="functions-to-interact-with-config-files">
+<h2>Functions to interact with config files<a class="headerlink" href="#functions-to-interact-with-config-files" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.read_file">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">c_void_p</span></span></span><a class="headerlink" href="#econf.read_file" title="Link to this definition"></a></dt>
+<dd><p>Read a config file and write the key-value pairs into a keyfile object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – absolute path of file to be parsed</p></li>
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pointer to a keyfile object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.new_key_file">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">new_key_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">c_void_p</span></span></span><a class="headerlink" href="#econf.new_key_file" title="Link to this definition"></a></dt>
+<dd><p>Create a new empty keyfile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pointer to created keyfile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.new_ini_file">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">new_ini_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">c_void_p</span></span></span><a class="headerlink" href="#econf.new_ini_file" title="Link to this definition"></a></dt>
+<dd><p>Create a new empty keyfile with delimiter ‘=’ and comment ‘#’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pointer to created keyfile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.merge_files">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">merge_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etc_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">c_void_p</span></span></span><a class="headerlink" href="#econf.merge_files" title="Link to this definition"></a></dt>
+<dd><p>Merge the content of 2 keyfile objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>usr_file</strong> – pointer to first keyfile</p></li>
+<li><p><strong>etc_file</strong> – pointer to second keyfile</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pointer to the merged keyfile object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.read_dirs">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etc_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">c_void_p</span></span></span><a class="headerlink" href="#econf.read_dirs" title="Link to this definition"></a></dt>
+<dd><p>Read configuration from the first found config file and merge with snippets from conf.d/ directory</p>
+<p>e.g. searches /usr/etc/ and /etc/ for an example.conf file and merges it with the snippets in either
+/usr/etc/example.conf.d/ or /etc/example.conf.d</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>usr_conf_dir</strong> – absolute path of the first directory to be searched</p></li>
+<li><p><strong>etc_conf_dir</strong> – absolute path of the second directory to be searched</p></li>
+<li><p><strong>project_name</strong> – basename of the configuration file</p></li>
+<li><p><strong>config_suffix</strong> – suffix of the configuration file</p></li>
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pointer to the merged keyfile object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.read_dirs_history">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_dirs_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etc_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">c_void_p</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#econf.read_dirs_history" title="Link to this definition"></a></dt>
+<dd><p>Read configuration from the first found config file and snippets from conf.d/ directory</p>
+<p>e.g. searches /usr/etc/ and /etc/ for an example.conf file and the snippets in either
+/usr/etc/example.conf.d/ or /etc/example.conf.d</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>usr_conf_dir</strong> – absolute path of the first directory to be searched</p></li>
+<li><p><strong>etc_conf_dir</strong> – absolute path of the second directory to be searched</p></li>
+<li><p><strong>project_name</strong> – basename of the configuration file</p></li>
+<li><p><strong>config_suffix</strong> – suffix of the configuration file</p></li>
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of pointers to parsed keyfiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.write_file">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">write_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_to_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Econf_err</span></span></span><a class="headerlink" href="#econf.write_file" title="Link to this definition"></a></dt>
+<dd><p>Write content of a keyfile to specified location</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>save_to_dir</strong> – directory into which the file has to be written</p></li>
+<li><p><strong>file_name</strong> – filename with suffix of the to be written file</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Error code</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="functions-for-getting-values">
+<h2>Functions for getting values<a class="headerlink" href="#functions-for-getting-values" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_groups">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#econf.get_groups" title="Link to this definition"></a></dt>
+<dd><p>List all the groups of given keyfile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kf</strong> – pointer to keyfile</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of groups in the keyfile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_keys">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#econf.get_keys" title="Link to this definition"></a></dt>
+<dd><p>List all the keys of a given group or all keys in a keyfile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – group of the keys to be returned</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of keys in the given group</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_int_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_int_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#econf.get_int_value" title="Link to this definition"></a></dt>
+<dd><p>Return an integer value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_uint_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_uint_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#econf.get_uint_value" title="Link to this definition"></a></dt>
+<dd><p>Return an unsigned integer value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_float_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_float_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#econf.get_float_value" title="Link to this definition"></a></dt>
+<dd><p>Return a float value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_string_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_string_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#econf.get_string_value" title="Link to this definition"></a></dt>
+<dd><p>Return a string value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_bool_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_bool_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#econf.get_bool_value" title="Link to this definition"></a></dt>
+<dd><p>Return a boolean value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="functions-for-getting-values-with-defaults">
+<h2>Functions for getting values with defaults<a class="headerlink" href="#functions-for-getting-values-with-defaults" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_int_value_def">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_int_value_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#econf.get_int_value_def" title="Link to this definition"></a></dt>
+<dd><p>Return an integer value for given group/key or return a default value if key is not found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>default</strong> – value to be returned if no key is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_uint_value_def">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_uint_value_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#econf.get_uint_value_def" title="Link to this definition"></a></dt>
+<dd><p>Return an unsigned integer value for given group/key or return a default value if key is not found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>default</strong> – value to be returned if no key is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_float_value_def">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_float_value_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#econf.get_float_value_def" title="Link to this definition"></a></dt>
+<dd><p>Return a float value for given group/key or return a default value if key is not found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>default</strong> – value to be returned if no key is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_string_value_def">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_string_value_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#econf.get_string_value_def" title="Link to this definition"></a></dt>
+<dd><p>Return a string value for given group/key or return a default value if key is not found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>default</strong> – value to be returned if no key is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_bool_value_def">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_bool_value_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#econf.get_bool_value_def" title="Link to this definition"></a></dt>
+<dd><p>Return a boolean value for given group/key or return a default value if key is not found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>default</strong> – value to be returned if no key is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="functions-for-setting-values">
+<h2>Functions for setting values<a class="headerlink" href="#functions-for-setting-values" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_int_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_int_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Econf_err</span></span></span><a class="headerlink" href="#econf.set_int_value" title="Link to this definition"></a></dt>
+<dd><p>Setting an integer value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>value</strong> – value to be set for given key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Error code</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_uint_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_uint_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Econf_err</span></span></span><a class="headerlink" href="#econf.set_uint_value" title="Link to this definition"></a></dt>
+<dd><p>Setting an unsigned integer value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>value</strong> – value to be set for given key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Error code</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_float_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_float_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Econf_err</span></span></span><a class="headerlink" href="#econf.set_float_value" title="Link to this definition"></a></dt>
+<dd><p>Setting a float value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>value</strong> – value to be set for given key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Error code</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_string_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_string_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Econf_err</span></span></span><a class="headerlink" href="#econf.set_string_value" title="Link to this definition"></a></dt>
+<dd><p>Setting a string value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>value</strong> – value to be set for given key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Error code</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_bool_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_bool_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">c_void_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Econf_err</span></span></span><a class="headerlink" href="#econf.set_bool_value" title="Link to this definition"></a></dt>
+<dd><p>Setting a boolean value for given group/key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kf</strong> – pointer to keyfile</p></li>
+<li><p><strong>group</strong> – desired group</p></li>
+<li><p><strong>key</strong> – key of the value that is requested</p></li>
+<li><p><strong>value</strong> – value to be set for given key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Error code</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="functions-for-memory-management">
+<h2>Functions for memory management<a class="headerlink" href="#functions-for-memory-management" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.free_file">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">free_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#econf.free_file" title="Link to this definition"></a></dt>
+<dd><p>Free the memory of a given keyfile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kf</strong> – pointer to keyfile</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="functions-for-handling-error-codes">
+<h2>Functions for handling error codes<a class="headerlink" href="#functions-for-handling-error-codes" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.err_string">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">err_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#econf.err_string" title="Link to this definition"></a></dt>
+<dd><p>Convert an error code into error message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> – error code as integer</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>error string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.err_location">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">err_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#econf.err_location" title="Link to this definition"></a></dt>
+<dd><p>Info about the line where an error happened</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>path to the last handled file and number of last handled line</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Nico Krapp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
