@@ -85,6 +85,30 @@ def _encode_str(string: str | bytes) -> bytes:
     return string
 
 
+def _check_int_overflow(val: int) -> bool:
+    if isinstance(val, int):
+        c_val = c_int64(val)
+        return c_val.value == val
+    else:
+        raise TypeError("parameter is not a nteger")
+
+
+def _check_uint_overflow(val: int) -> bool:
+    if isinstance(val, int) & (val >= 0):
+        c_val = c_uint64(val)
+        return c_val.value == val
+    else:
+        raise TypeError("parameter is not a unsigned integer")
+
+
+def _check_float_overflow(val: float) -> bool:
+    if isinstance(val, float):
+        c_val = c_double(val)
+        return c_val.value == val
+    else:
+        raise TypeError("parameter is not a float")
+
+
 libname = ctypes.util.find_library("econf")
 libeconf = CDLL(libname)
 
@@ -312,6 +336,8 @@ def get_int64_value_def(kf: c_void_p, group: str, key: str, default: int) -> int
     c_result = c_int64()
     if not isinstance(default, int):
         raise TypeError(f"\"default\" parameter must be of type int")
+    if not _check_int_overflow(default):
+        raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_default = c_int64(default)
     err = libeconf.econf_getInt64ValueDef(
         kf, c_group, c_key, byref(c_result), c_default
@@ -333,6 +359,8 @@ def get_uint64_value_def(kf: c_void_p, group: str, key: str, default: int) -> in
     c_result = c_uint64()
     if not isinstance(default, int) | (default < 0):
         raise TypeError(f"\"default\" parameter must be of type int and greater or equal to zero")
+    if not _check_uint_overflow(default):
+        raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_default = c_uint64(default)
     err = libeconf.econf_getUInt64ValueDef(
         kf, c_group, c_key, byref(c_result), c_default
@@ -354,6 +382,8 @@ def get_double_value_def(kf: c_void_p, group: str, key: str, default: float) -> 
     c_result = c_double()
     if not isinstance(default, float):
         raise TypeError(f"\"default\" parameter must be of type float")
+    if not _check_float_overflow(default):
+        raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_default = c_double(default)
     err = libeconf.econf_getDoubleValueDef(
         kf, c_group, c_key, byref(c_result), c_default
@@ -404,6 +434,8 @@ def set_int64_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err
     c_key = c_char_p(_encode_str(key))
     if not isinstance(value, int):
         raise TypeError(f"\"value\" parameter must be of type int")
+    if not _check_int_overflow(value):
+        raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_value = c_int64(value)
     err = libeconf.econf_setInt64Value(kf, c_group, c_key, c_value)
     if err != 0:
@@ -420,6 +452,8 @@ def set_uint64_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_er
     c_key = c_char_p(_encode_str(key))
     if not isinstance(value, int) | (value < 0):
         raise TypeError(f"\"value\" parameter must be of type int and be greater or equal to zero")
+    if not _check_uint_overflow(value):
+        raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_value = c_uint64(value)
     err = libeconf.econf_setUInt64Value(kf, c_group, c_key, c_value)
     if err != 0:
@@ -436,6 +470,8 @@ def set_double_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_
     c_key = c_char_p(_encode_str(key))
     if not isinstance(value, float):
         raise TypeError(f"\"value\" parameter must be of type float")
+    if not _check_float_overflow(value):
+        raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_value = c_double(value)
     err = libeconf.econf_setDoubleValue(kf, c_group, c_key, c_value)
     if err != 0:
