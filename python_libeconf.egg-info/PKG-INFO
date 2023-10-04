@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: python-libeconf
+Version: 0.1.0
+Summary: Python bindings for libeconf
+Author-email: nkrapp <nico.krapp@suse.com>
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# python-libeconf
+Python bindings for libeconf

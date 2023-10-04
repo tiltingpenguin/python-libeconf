@@ -113,6 +113,15 @@ libeconf = CDLL(libname)
 
 
 def set_value(kf: c_void_p, group: str | bytes, key: str | bytes, value: Any) -> Econf_err:
+    """
+    Dynamically set a value in a keyfile and returns a status code
+
+    :param kf: given/parsed Data from a config file
+    :param group: group of the key to be changed
+    :param key: key to be changed
+    :param value: desired value
+    :return: Error code
+    """
     if isinstance(value, int):
         if value >= 0:
             res = set_uint_value(kf, group, key, value)
@@ -130,7 +139,14 @@ def set_value(kf: c_void_p, group: str | bytes, key: str | bytes, value: Any) ->
 
 
 def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) -> c_void_p:
-    # return Pointer to object, no need to parse it
+    """
+    Read a config file and write the key-value pairs into a keyfile object
+
+    :param file_name: absolute path of file to be parsed
+    :param delim: delimiter of a key/value e.g. '='
+    :param comment: string that defines the start of a comment e.g. '#'
+    :return: pointer to a keyfile object
+    """
     result = c_void_p(None)
     file_name = _encode_str(file_name)
     delim = _encode_str(delim)
@@ -142,6 +158,13 @@ def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) 
 
 
 def merge_files(usr_file: c_void_p, etc_file: c_void_p) -> c_void_p:
+    """
+    Merge the content of 2 keyfile objects
+
+    :param usr_file: pointer to first keyfile
+    :param etc_file: pointer to second keyfile
+    :return: pointer to the merged keyfile object
+    """
     merged_file = c_void_p(None)
     err = libeconf.econf_mergeFiles(byref(merged_file), usr_file, etc_file)
     if err:
@@ -158,6 +181,20 @@ def read_dirs(
     delim: str | bytes,
     comment: str | bytes,
 ) -> c_void_p:
+    """
+    Read configuration from the first found config file and merge with snippets from conf.d/ directory
+
+    e.g. searches /usr/etc/ and /etc/ for an example.conf file and merges it with the snippets in either
+    /usr/etc/example.conf.d/ or /etc/example.conf.d
+
+    :param usr_conf_dir: absolute path of the first directory to be searched
+    :param etc_conf_dir: absolute path of the second directory to be searched
+    :param project_name: basename of the configuration file
+    :param config_suffix: suffix of the configuration file
+    :param delim: delimiter of a key/value e.g. '='
+    :param comment: string that defines the start of a comment e.g. '#'
+    :return: pointer to the merged keyfile object
+    """
     result = c_void_p(None)
     c_usr_conf_dir = _encode_str(usr_conf_dir)
     c_etc_conf_dir = _encode_str(etc_conf_dir)
@@ -186,6 +223,20 @@ def read_dirs_history(
     delim: str | bytes,
     comment: str | bytes,
 ) -> list[c_void_p]:
+    """
+    Read configuration from the first found config file and snippets from conf.d/ directory
+
+    e.g. searches /usr/etc/ and /etc/ for an example.conf file and the snippets in either
+    /usr/etc/example.conf.d/ or /etc/example.conf.d
+
+    :param usr_conf_dir: absolute path of the first directory to be searched
+    :param etc_conf_dir: absolute path of the second directory to be searched
+    :param project_name: basename of the configuration file
+    :param config_suffix: suffix of the configuration file
+    :param delim: delimiter of a key/value e.g. '='
+    :param comment: string that defines the start of a comment e.g. '#'
+    :return: list of pointers to parsed keyfiles
+    """
     key_files = c_void_p(None)
     c_size = c_size_t()
     c_usr_conf_dir = _encode_str(usr_conf_dir)
@@ -212,6 +263,13 @@ def read_dirs_history(
 
 
 def new_key_file(delim: str | bytes, comment: str | bytes) -> c_void_p:
+    """
+    Create a new empty keyfile
+
+    :param delim: delimiter of a key/value e.g. '='
+    :param comment: string that defines the start of a comment e.g. '#'
+    :return: pointer to created keyfile
+    """
     result = c_void_p(None)
     delim = _encode_str(delim)
     comment = _encode_str(comment)
@@ -222,6 +280,11 @@ def new_key_file(delim: str | bytes, comment: str | bytes) -> c_void_p:
 
 
 def new_ini_file() -> c_void_p:
+    """
+    Create a new empty keyfile with delimiter '=' and comment '#'
+
+    :return: pointer to created keyfile
+    """
     result = c_void_p(None)
     err = libeconf.econf_newIniFile(result)
     if err:
@@ -230,6 +293,14 @@ def new_ini_file() -> c_void_p:
 
 
 def write_file(kf: c_void_p, save_to_dir: str, file_name: str) -> Econf_err:
+    """
+    Write content of a keyfile to specified location
+
+    :param kf: pointer to keyfile
+    :param save_to_dir: directory into which the file has to be written
+    :param file_name: filename with suffix of the to be written file
+    :return: Error code
+    """
     c_save_to_dir = _encode_str(save_to_dir)
     c_file_name = _encode_str(file_name)
     err = libeconf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
@@ -237,12 +308,24 @@ def write_file(kf: c_void_p, save_to_dir: str, file_name: str) -> Econf_err:
 
 
 def get_path(kf: c_void_p) -> str:
+    """
+    Get the path of the source of the given key file
+
+    :param kf: pointer to keyfile
+    :return: path of the config file as string
+    """
     # extract from pointer
     libeconf.econf_getPath.restype = c_char_p
     return libeconf.econf_getPath(kf).decode("utf-8")
 
 
 def get_groups(kf: c_void_p) -> list[str]:
+    """
+    List all the groups of given keyfile
+
+    :param kf: pointer to keyfile
+    :return: list of groups in the keyfile
+    """
     c_length = c_size_t()
     c_groups = c_void_p(None)
     err = libeconf.econf_getGroups(kf, byref(c_length), byref(c_groups))
@@ -255,6 +338,13 @@ def get_groups(kf: c_void_p) -> list[str]:
 
 # Not passing a group currently leads to ECONF_NOKEY error
 def get_keys(kf: c_void_p, group: str) -> list[str]:
+    """
+    List all the keys of a given group or all keys in a keyfile
+
+    :param kf: pointer to keyfile
+    :param group: group of the keys to be returned
+    :return: list of keys in the given group
+    """
     c_length = c_size_t()
     c_keys = c_void_p(None)
     group = _encode_str(group)
@@ -267,6 +357,14 @@ def get_keys(kf: c_void_p, group: str) -> list[str]:
 
 
 def get_int_value(kf: c_void_p, group: str, key: str) -> int:
+    """
+    Return an integer value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_int64()
@@ -277,6 +375,14 @@ def get_int_value(kf: c_void_p, group: str, key: str) -> int:
 
 
 def get_uint_value(kf: c_void_p, group: str, key: str) -> int:
+    """
+    Return an unsigned integer value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_uint64()
@@ -287,6 +393,14 @@ def get_uint_value(kf: c_void_p, group: str, key: str) -> int:
 
 
 def get_float_value(kf: c_void_p, group: str, key: str) -> float:
+    """
+    Return a float value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_double()
@@ -297,6 +411,14 @@ def get_float_value(kf: c_void_p, group: str, key: str) -> float:
 
 
 def get_string_value(kf: c_void_p, group: str, key: str) -> str:
+    """
+    Return a string value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_char_p()
@@ -307,6 +429,14 @@ def get_string_value(kf: c_void_p, group: str, key: str) -> str:
 
 
 def get_bool_value(kf: c_void_p, group: str, key: str) -> bool:
+    """
+    Return a boolean value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_bool()
@@ -317,6 +447,15 @@ def get_bool_value(kf: c_void_p, group: str, key: str) -> bool:
 
 
 def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
+    """
+    Return an integer value for given group/key or return a default value if key is not found
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param default: value to be returned if no key is found
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_int64()
@@ -336,6 +475,15 @@ def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
 
 
 def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
+    """
+    Return an unsigned integer value for given group/key or return a default value if key is not found
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param default: value to be returned if no key is found
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_uint64()
@@ -355,6 +503,15 @@ def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
 
 
 def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> float:
+    """
+    Return a float value for given group/key or return a default value if key is not found
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param default: value to be returned if no key is found
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_double()
@@ -374,6 +531,15 @@ def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> f
 
 
 def get_string_value_def(kf: c_void_p, group: str, key: str, default: str) -> str:
+    """
+    Return a string value for given group/key or return a default value if key is not found
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param default: value to be returned if no key is found
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_char_p()
@@ -389,6 +555,15 @@ def get_string_value_def(kf: c_void_p, group: str, key: str, default: str) -> st
 
 
 def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> bool:
+    """
+    Return a boolean value for given group/key or return a default value if key is not found
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param default: value to be returned if no key is found
+    :return: value of the key
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_bool()
@@ -404,6 +579,15 @@ def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> boo
 
 
 def set_int_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
+    """
+    Setting an integer value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param value: value to be set for given key
+    :return: Error code
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, int):
@@ -418,6 +602,15 @@ def set_int_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
 
 
 def set_uint_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
+    """
+    Setting an unsigned integer value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param value: value to be set for given key
+    :return: Error code
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, int) | (value < 0):
@@ -432,6 +625,15 @@ def set_uint_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
 
 
 def set_float_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_err:
+    """
+    Setting a float value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param value: value to be set for given key
+    :return: Error code
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, float):
@@ -446,6 +648,15 @@ def set_float_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_e
 
 
 def set_string_value(kf: c_void_p, group: str, key: str, value: str | bytes) -> Econf_err:
+    """
+    Setting a string value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param value: value to be set for given key
+    :return: Error code
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_value = _encode_str(value)
@@ -456,6 +667,15 @@ def set_string_value(kf: c_void_p, group: str, key: str, value: str | bytes) -> 
 
 
 def set_bool_value(kf: c_void_p, group: str, key: str, value: bool) -> Econf_err:
+    """
+    Setting a boolean value for given group/key
+
+    :param kf: pointer to keyfile
+    :param group: desired group
+    :param key: key of the value that is requested
+    :param value: value to be set for given key
+    :return: Error code
+    """
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, bool):
@@ -468,6 +688,12 @@ def set_bool_value(kf: c_void_p, group: str, key: str, value: bool) -> Econf_err
 
 
 def err_string(error: int):
+    """
+    Convert an error code into error message
+
+    :param error: error code as integer
+    :return: error string
+    """
     if not isinstance(error, int):
         raise TypeError("Error codes must be of type int")
     c_int(error)
@@ -475,13 +701,24 @@ def err_string(error: int):
     return libeconf.econf_errString(error).decode("utf-8")
 
 
-def err_location(filename: str, line_nr: int):
-    c_filename = c_char_p(_encode_str(filename))
-    c_line_nr = c_uint64(line_nr)
+def err_location():
+    """
+    Info about the line where an error happened
+
+    :return: path to the last handled file and number of last handled line
+    """
+    c_filename = c_char_p()
+    c_line_nr = c_uint64()
     libeconf.econf_errLocation(byref(c_filename), byref(c_line_nr))
     return c_filename.value, c_line_nr.value
 
 
 def free_file(kf):
+    """
+    Free the memory of a given keyfile
+
+    :param kf: pointer to keyfile
+    :return: None
+    """
     libeconf.econf_freeFile(kf)
     return

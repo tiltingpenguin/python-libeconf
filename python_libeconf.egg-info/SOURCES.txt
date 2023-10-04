@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+econf/__init__.py
+econf/econf.py
+python_libeconf.egg-info/PKG-INFO
+python_libeconf.egg-info/SOURCES.txt
+python_libeconf.egg-info/dependency_links.txt
+python_libeconf.egg-info/top_level.txt
+tests/test.py

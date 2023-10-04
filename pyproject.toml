@@ -1,17 +1,18 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "python-libeconf"
 version = "0.1.0"
 description = "Python bindings for libeconf"
-authors = ["nkrapp <nico.krapp@suse.com>"]
+authors = [{name="nkrapp", email="nico.krapp@suse.com"}]
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "^3.8"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[project.optional-dependencies]
+doc_requires = [
+    "sphinx",
+]
 
 [tool.isort]
 profile = "black"
