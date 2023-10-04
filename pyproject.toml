@@ -12,6 +12,7 @@ readme = "README.md"
 [project.optional-dependencies]
 doc_requires = [
     "sphinx",
+    "sphinx_rtd_theme"
 ]
 
 [tool.isort]
