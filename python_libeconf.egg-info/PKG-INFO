@@ -3,9 +3,11 @@ Name: python-libeconf
 Version: 0.1.0
 Summary: Python bindings for libeconf
 Author-email: nkrapp <nico.krapp@suse.com>
-Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Provides-Extra: doc-requires
+Requires-Dist: sphinx; extra == "doc-requires"
+Requires-Dist: sphinx-rtd-theme; extra == "doc-requires"
 
 # python-libeconf
 Python bindings for libeconf

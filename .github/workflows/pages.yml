@@ -8,6 +8,11 @@ jobs:
   pages:
     runs-on: ubuntu-latest
     steps:
+    - id: setup
+      uses: actions/checkout@v3
+      run: |
+        python -m pip install --upgrade pip
+        pip install doc_requires
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
