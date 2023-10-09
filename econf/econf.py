@@ -1,10 +1,11 @@
 import ctypes.util
 from enum import Enum
+from dataclasses import dataclass
 from typing import *
 from ctypes import *
 
-libname = ctypes.util.find_library("econf")
-libeconf = CDLL(libname)
+LIBNAME = ctypes.util.find_library("econf")
+LIBECONF = CDLL(LIBNAME)
 
 @dataclass
 class Keyfile:
@@ -12,9 +13,6 @@ class Keyfile:
     Class which points to the Key Value storage object
     """
     ptr: c_void_p
-
-    def __init__(self, ptr: c_void_p):
-        self.ptr = ptr
 
     def __del__(self):
         free_file(self)
@@ -159,11 +157,11 @@ def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) 
     :param comment: string that defines the start of a comment e.g. '#'
     :return: Key-Value storage object
     """
-    result = Keyfile(c_void_p())
+    result = Keyfile(c_void_p(None))
     file_name = _encode_str(file_name)
     delim = _encode_str(delim)
     comment = _encode_str(comment)
-    err = libeconf.econf_readFile(byref(result.ptr), file_name, delim, comment)
+    err = LIBECONF.econf_readFile(byref(result.ptr), file_name, delim, comment)
     if err:
         raise _exceptions(err, f"read_file failed with error: {err_string(err)}")
     return result
@@ -178,7 +176,7 @@ def merge_files(usr_file: Keyfile, etc_file: Keyfile) -> Keyfile:
     :return: merged Keyfile object
     """
     merged_file = Keyfile(c_void_p())
-    err = libeconf.econf_mergeFiles(byref(merged_file.ptr), usr_file.ptr, etc_file.ptr)
+    err = LIBECONF.econf_mergeFiles(byref(merged_file.ptr), usr_file.ptr, etc_file.ptr)
     if err:
         raise _exceptions(err, f"merge_files failed with error: {err_string(err)}")
     return merged_file
@@ -212,7 +210,7 @@ def read_dirs(
     c_etc_conf_dir = _encode_str(etc_conf_dir)
     c_project_name = _encode_str(project_name)
     c_config_suffix = _encode_str(config_suffix)
-    err = libeconf.econf_readDirs(
+    err = LIBECONF.econf_readDirs(
         byref(result.ptr),
         c_usr_conf_dir,
         c_etc_conf_dir,
@@ -255,7 +253,7 @@ def read_dirs_history(
     c_etc_conf_dir = _encode_str(etc_conf_dir)
     c_project_name = _encode_str(project_name)
     c_config_suffix = _encode_str(config_suffix)
-    err = libeconf.econf_readDirsHistory(
+    err = LIBECONF.econf_readDirsHistory(
         byref(key_files),
         byref(c_size),
         c_usr_conf_dir,
@@ -285,7 +283,7 @@ def new_key_file(delim: str | bytes, comment: str | bytes) -> Keyfile:
     result = Keyfile(c_void_p)
     delim = _encode_str(delim)
     comment = _encode_str(comment)
-    err = libeconf.econf_newKeyFile(byref(result.ptr), delim, comment)
+    err = LIBECONF.econf_newKeyFile(byref(result.ptr), delim, comment)
     if err:
         raise _exceptions(err, f"new_key_file failed with error: {err_string(err)}")
     return result
@@ -298,7 +296,7 @@ def new_ini_file() -> Keyfile:
     :return: created Keyfile object
     """
     result = Keyfile(c_void_p)
-    err = libeconf.econf_newIniFile(byref(result.ptr))
+    err = LIBECONF.econf_newIniFile(byref(result.ptr))
     if err:
         raise _exceptions(err, f"new_ini_file failed with error: {err_string(err)}")
     return result
@@ -315,7 +313,7 @@ def write_file(kf: Keyfile, save_to_dir: str, file_name: str) -> Econf_err:
     """
     c_save_to_dir = _encode_str(save_to_dir)
     c_file_name = _encode_str(file_name)
-    err = libeconf.econf_writeFile(byref(kf.ptr), c_save_to_dir, c_file_name)
+    err = LIBECONF.econf_writeFile(byref(kf.ptr), c_save_to_dir, c_file_name)
     return Econf_err(err)
 
 
@@ -327,8 +325,8 @@ def get_path(kf: Keyfile) -> str:
     :return: path of the config file as string
     """
     # extract from pointer
-    libeconf.econf_getPath.restype = c_char_p
-    return libeconf.econf_getPath(kf.ptr).decode("utf-8")
+    LIBECONF.econf_getPath.restype = c_char_p
+    return LIBECONF.econf_getPath(kf.ptr).decode("utf-8")
 
 
 def get_groups(kf: Keyfile) -> list[str]:
@@ -340,7 +338,7 @@ def get_groups(kf: Keyfile) -> list[str]:
     """
     c_length = c_size_t()
     c_groups = c_void_p(None)
-    err = libeconf.econf_getGroups(kf.ptr, byref(c_length), byref(c_groups))
+    err = LIBECONF.econf_getGroups(kf.ptr, byref(c_length), byref(c_groups))
     if err:
         _exceptions(err, f"get_groups failed with error: {err_string(err)}")
     arr = cast(c_groups, POINTER(c_char_p * c_length.value))
@@ -360,7 +358,7 @@ def get_keys(kf: Keyfile, group: str) -> list[str]:
     c_length = c_size_t()
     c_keys = c_void_p(None)
     group = _encode_str(group)
-    err = libeconf.econf_getKeys(kf.ptr, group, byref(c_length), byref(c_keys))
+    err = LIBECONF.econf_getKeys(kf.ptr, group, byref(c_length), byref(c_keys))
     if err:
         _exceptions(err, f"get_keys failed with error: {err_string(err)}")
     arr = cast(c_keys, POINTER(c_char_p * c_length.value))
@@ -380,7 +378,7 @@ def get_int_value(kf: Keyfile, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_int64()
-    err = libeconf.econf_getInt64Value(kf.ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getInt64Value(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_int64_value failed with error: {err_string(err)}")
     return c_result.value
@@ -398,7 +396,7 @@ def get_uint_value(kf: Keyfile, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_uint64()
-    err = libeconf.econf_getUInt64Value(kf.ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getUInt64Value(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_uint64_value failed with error: {err_string(err)}")
     return c_result.value
@@ -416,7 +414,7 @@ def get_float_value(kf: Keyfile, group: str, key: str) -> float:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_double()
-    err = libeconf.econf_getDoubleValue(kf.ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getDoubleValue(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_double_value failed with error: {err_string(err)}")
     return c_result.value
@@ -434,7 +432,7 @@ def get_string_value(kf: Keyfile, group: str, key: str) -> str:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_char_p()
-    err = libeconf.econf_getStringValue(kf.ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getStringValue(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_string_value failed with error: {err_string(err)}")
     return c_result.value.decode("utf-8")
@@ -452,7 +450,7 @@ def get_bool_value(kf: Keyfile, group: str, key: str) -> bool:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_bool()
-    err = libeconf.econf_getBoolValue(kf.ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getBoolValue(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_bool_value failed with error: {err_string(err)}")
     return c_result.value
@@ -476,7 +474,7 @@ def get_int_value_def(kf: Keyfile, group: str, key: str, default: int) -> int:
     if not _check_int_overflow(default):
         raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_default = c_int64(default)
-    err = libeconf.econf_getInt64ValueDef(
+    err = LIBECONF.econf_getInt64ValueDef(
         kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
@@ -504,7 +502,7 @@ def get_uint_value_def(kf: Keyfile, group: str, key: str, default: int) -> int:
     if not _check_uint_overflow(default):
         raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_default = c_uint64(default)
-    err = libeconf.econf_getUInt64ValueDef(
+    err = LIBECONF.econf_getUInt64ValueDef(
         kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
@@ -532,7 +530,7 @@ def get_float_value_def(kf: Keyfile, group: str, key: str, default: float) -> fl
     if not _check_float_overflow(default):
         raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_default = c_double(default)
-    err = libeconf.econf_getDoubleValueDef(
+    err = LIBECONF.econf_getDoubleValueDef(
         kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
@@ -556,7 +554,7 @@ def get_string_value_def(kf: Keyfile, group: str, key: str, default: str) -> str
     c_key = _encode_str(key)
     c_result = c_char_p()
     c_default = _encode_str(default)
-    err = libeconf.econf_getStringValueDef(
+    err = LIBECONF.econf_getStringValueDef(
         kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
@@ -582,7 +580,7 @@ def get_bool_value_def(kf: Keyfile, group: str, key: str, default: bool) -> bool
     if not isinstance(default, bool):
         raise TypeError(f"\"value\" parameter must be of type bool")
     c_default = c_bool(default)
-    err = libeconf.econf_getBoolValueDef(kf.ptr, c_group, c_key, byref(c_result), c_default)
+    err = LIBECONF.econf_getBoolValueDef(kf.ptr, c_group, c_key, byref(c_result), c_default)
     if err:
         if err == 5:
             return c_default.value
@@ -607,7 +605,7 @@ def set_int_value(kf: Keyfile, group: str, key: str, value: int) -> Econf_err:
     if not _check_int_overflow(value):
         raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_value = c_int64(value)
-    err = libeconf.econf_setInt64Value(byref(kf.ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setInt64Value(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_int64_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -630,7 +628,7 @@ def set_uint_value(kf: Keyfile, group: str, key: str, value: int) -> Econf_err:
     if not _check_uint_overflow(value):
         raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_value = c_uint64(value)
-    err = libeconf.econf_setUInt64Value(byref(kf.ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setUInt64Value(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_uint64_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -653,7 +651,7 @@ def set_float_value(kf: Keyfile, group: str, key: str, value: float) -> Econf_er
     if not _check_float_overflow(value):
         raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_value = c_double(value)
-    err = libeconf.econf_setDoubleValue(byref(kf.ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setDoubleValue(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_double_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -672,7 +670,7 @@ def set_string_value(kf: Keyfile, group: str, key: str, value: str | bytes) -> E
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_value = _encode_str(value)
-    err = libeconf.econf_setStringValue(byref(kf.ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setStringValue(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_string_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -693,7 +691,7 @@ def set_bool_value(kf: Keyfile, group: str, key: str, value: bool) -> Econf_err:
     if not isinstance(value, bool):
         raise TypeError(f"\"value\" parameter must be of type bool")
     c_value = c_bool(value)
-    err = libeconf.econf_setBoolValue(byref(kf.ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setBoolValue(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_bool_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -709,8 +707,8 @@ def err_string(error: int):
     if not isinstance(error, int):
         raise TypeError("Error codes must be of type int")
     c_int(error)
-    libeconf.econf_errString.restype = c_char_p
-    return libeconf.econf_errString(error).decode("utf-8")
+    LIBECONF.econf_errString.restype = c_char_p
+    return LIBECONF.econf_errString(error).decode("utf-8")
 
 
 def err_location():
@@ -721,7 +719,7 @@ def err_location():
     """
     c_filename = c_char_p()
     c_line_nr = c_uint64()
-    libeconf.econf_errLocation(byref(c_filename), byref(c_line_nr))
+    LIBECONF.econf_errLocation(byref(c_filename), byref(c_line_nr))
     return c_filename.value, c_line_nr.value
 
 
@@ -732,5 +730,5 @@ def free_file(kf: Keyfile):
     :param kf: Keyfile to be freed
     :return: None
     """
-    libeconf.econf_freeFile(kf.ptr)
+    LIBECONF.econf_freeFile(kf.ptr)
     return
