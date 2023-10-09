@@ -3,6 +3,22 @@ from enum import Enum
 from typing import *
 from ctypes import *
 
+libname = ctypes.util.find_library("econf")
+libeconf = CDLL(libname)
+
+@dataclass
+class Keyfile:
+    """
+    Class which points to the Key Value storage object
+    """
+    ptr: c_void_p
+
+    def __init__(self, ptr: c_void_p):
+        self.ptr = ptr
+
+    def __del__(self):
+        free_file(self)
+
 
 class Econf_err(Enum):
     ECONF_SUCCESS = 0
@@ -89,7 +105,7 @@ def _check_int_overflow(val: int) -> bool:
         c_val = c_int64(val)
         return c_val.value == val
     else:
-        raise TypeError("parameter is not a nteger")
+        raise TypeError("parameter is not an integer")
 
 
 def _check_uint_overflow(val: int) -> bool:
@@ -108,15 +124,11 @@ def _check_float_overflow(val: float) -> bool:
         raise TypeError("parameter is not a float")
 
 
-libname = ctypes.util.find_library("econf")
-libeconf = CDLL(libname)
-
-
-def set_value(kf: c_void_p, group: str | bytes, key: str | bytes, value: Any) -> Econf_err:
+def set_value(kf: Keyfile, group: str | bytes, key: str | bytes, value: Any) -> Econf_err:
     """
     Dynamically set a value in a keyfile and returns a status code
 
-    :param kf: given/parsed Data from a config file
+    :param kf: Keyfile object to set value in
     :param group: group of the key to be changed
     :param key: key to be changed
     :param value: desired value
@@ -138,35 +150,35 @@ def set_value(kf: c_void_p, group: str | bytes, key: str | bytes, value: Any) ->
     return res
 
 
-def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) -> c_void_p:
+def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) -> Keyfile:
     """
     Read a config file and write the key-value pairs into a keyfile object
 
     :param file_name: absolute path of file to be parsed
     :param delim: delimiter of a key/value e.g. '='
     :param comment: string that defines the start of a comment e.g. '#'
-    :return: pointer to a keyfile object
+    :return: Key-Value storage object
     """
-    result = c_void_p(None)
+    result = Keyfile(c_void_p())
     file_name = _encode_str(file_name)
     delim = _encode_str(delim)
     comment = _encode_str(comment)
-    err = libeconf.econf_readFile(byref(result), file_name, delim, comment)
+    err = libeconf.econf_readFile(byref(result.ptr), file_name, delim, comment)
     if err:
         raise _exceptions(err, f"read_file failed with error: {err_string(err)}")
     return result
 
 
-def merge_files(usr_file: c_void_p, etc_file: c_void_p) -> c_void_p:
+def merge_files(usr_file: Keyfile, etc_file: Keyfile) -> Keyfile:
     """
     Merge the content of 2 keyfile objects
 
-    :param usr_file: pointer to first keyfile
-    :param etc_file: pointer to second keyfile
-    :return: pointer to the merged keyfile object
+    :param usr_file: first Keyfile object
+    :param etc_file: second Keyfile object
+    :return: merged Keyfile object
     """
-    merged_file = c_void_p(None)
-    err = libeconf.econf_mergeFiles(byref(merged_file), usr_file, etc_file)
+    merged_file = Keyfile(c_void_p())
+    err = libeconf.econf_mergeFiles(byref(merged_file.ptr), usr_file.ptr, etc_file.ptr)
     if err:
         raise _exceptions(err, f"merge_files failed with error: {err_string(err)}")
     return merged_file
@@ -180,7 +192,7 @@ def read_dirs(
     config_suffix: str | bytes,
     delim: str | bytes,
     comment: str | bytes,
-) -> c_void_p:
+) -> Keyfile:
     """
     Read configuration from the first found config file and merge with snippets from conf.d/ directory
 
@@ -193,15 +205,15 @@ def read_dirs(
     :param config_suffix: suffix of the configuration file
     :param delim: delimiter of a key/value e.g. '='
     :param comment: string that defines the start of a comment e.g. '#'
-    :return: pointer to the merged keyfile object
+    :return: merged Keyfile object
     """
-    result = c_void_p(None)
+    result = Keyfile(c_void_p())
     c_usr_conf_dir = _encode_str(usr_conf_dir)
     c_etc_conf_dir = _encode_str(etc_conf_dir)
     c_project_name = _encode_str(project_name)
     c_config_suffix = _encode_str(config_suffix)
     err = libeconf.econf_readDirs(
-        byref(result),
+        byref(result.ptr),
         c_usr_conf_dir,
         c_etc_conf_dir,
         c_project_name,
@@ -222,7 +234,7 @@ def read_dirs_history(
     config_suffix: str | bytes,
     delim: str | bytes,
     comment: str | bytes,
-) -> list[c_void_p]:
+) -> list[Keyfile]:
     """
     Read configuration from the first found config file and snippets from conf.d/ directory
 
@@ -235,7 +247,7 @@ def read_dirs_history(
     :param config_suffix: suffix of the configuration file
     :param delim: delimiter of a key/value e.g. '='
     :param comment: string that defines the start of a comment e.g. '#'
-    :return: list of pointers to parsed keyfiles
+    :return: list of Keyfile objects
     """
     key_files = c_void_p(None)
     c_size = c_size_t()
@@ -258,77 +270,77 @@ def read_dirs_history(
             err, f"read_dirs_history failed with error: {err_string(err)}"
         )
     arr = cast(key_files, POINTER(c_void_p * c_size.value))
-    result = [c_void_p(i) for i in arr.contents]
+    result = [Keyfile(c_void_p(i)) for i in arr.contents]
     return result
 
 
-def new_key_file(delim: str | bytes, comment: str | bytes) -> c_void_p:
+def new_key_file(delim: str | bytes, comment: str | bytes) -> Keyfile:
     """
     Create a new empty keyfile
 
     :param delim: delimiter of a key/value e.g. '='
     :param comment: string that defines the start of a comment e.g. '#'
-    :return: pointer to created keyfile
+    :return: created Keyfile object
     """
-    result = c_void_p(None)
+    result = Keyfile(c_void_p)
     delim = _encode_str(delim)
     comment = _encode_str(comment)
-    err = libeconf.econf_newKeyFile(result, delim, comment)
+    err = libeconf.econf_newKeyFile(byref(result.ptr), delim, comment)
     if err:
         raise _exceptions(err, f"new_key_file failed with error: {err_string(err)}")
     return result
 
 
-def new_ini_file() -> c_void_p:
+def new_ini_file() -> Keyfile:
     """
     Create a new empty keyfile with delimiter '=' and comment '#'
 
-    :return: pointer to created keyfile
+    :return: created Keyfile object
     """
-    result = c_void_p(None)
-    err = libeconf.econf_newIniFile(result)
+    result = Keyfile(c_void_p)
+    err = libeconf.econf_newIniFile(byref(result.ptr))
     if err:
         raise _exceptions(err, f"new_ini_file failed with error: {err_string(err)}")
     return result
 
 
-def write_file(kf: c_void_p, save_to_dir: str, file_name: str) -> Econf_err:
+def write_file(kf: Keyfile, save_to_dir: str, file_name: str) -> Econf_err:
     """
     Write content of a keyfile to specified location
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param save_to_dir: directory into which the file has to be written
     :param file_name: filename with suffix of the to be written file
     :return: Error code
     """
     c_save_to_dir = _encode_str(save_to_dir)
     c_file_name = _encode_str(file_name)
-    err = libeconf.econf_writeFile(byref(kf), c_save_to_dir, c_file_name)
+    err = libeconf.econf_writeFile(byref(kf.ptr), c_save_to_dir, c_file_name)
     return Econf_err(err)
 
 
-def get_path(kf: c_void_p) -> str:
+def get_path(kf: Keyfile) -> str:
     """
     Get the path of the source of the given key file
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :return: path of the config file as string
     """
     # extract from pointer
     libeconf.econf_getPath.restype = c_char_p
-    return libeconf.econf_getPath(kf).decode("utf-8")
+    return libeconf.econf_getPath(kf.ptr).decode("utf-8")
 
 
-def get_groups(kf: c_void_p) -> list[str]:
+def get_groups(kf: Keyfile) -> list[str]:
     """
     List all the groups of given keyfile
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :return: list of groups in the keyfile
     """
     c_length = c_size_t()
     c_groups = c_void_p(None)
-    err = libeconf.econf_getGroups(kf, byref(c_length), byref(c_groups))
+    err = libeconf.econf_getGroups(kf.ptr, byref(c_length), byref(c_groups))
     if err:
         _exceptions(err, f"get_groups failed with error: {err_string(err)}")
     arr = cast(c_groups, POINTER(c_char_p * c_length.value))
@@ -337,18 +349,18 @@ def get_groups(kf: c_void_p) -> list[str]:
 
 
 # Not passing a group currently leads to ECONF_NOKEY error
-def get_keys(kf: c_void_p, group: str) -> list[str]:
+def get_keys(kf: Keyfile, group: str) -> list[str]:
     """
     List all the keys of a given group or all keys in a keyfile
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: group of the keys to be returned
     :return: list of keys in the given group
     """
     c_length = c_size_t()
     c_keys = c_void_p(None)
     group = _encode_str(group)
-    err = libeconf.econf_getKeys(kf, group, byref(c_length), byref(c_keys))
+    err = libeconf.econf_getKeys(kf.ptr, group, byref(c_length), byref(c_keys))
     if err:
         _exceptions(err, f"get_keys failed with error: {err_string(err)}")
     arr = cast(c_keys, POINTER(c_char_p * c_length.value))
@@ -356,11 +368,11 @@ def get_keys(kf: c_void_p, group: str) -> list[str]:
     return result
 
 
-def get_int_value(kf: c_void_p, group: str, key: str) -> int:
+def get_int_value(kf: Keyfile, group: str, key: str) -> int:
     """
     Return an integer value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -368,17 +380,17 @@ def get_int_value(kf: c_void_p, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_int64()
-    err = libeconf.econf_getInt64Value(kf, c_group, c_key, byref(c_result))
+    err = libeconf.econf_getInt64Value(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_int64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_uint_value(kf: c_void_p, group: str, key: str) -> int:
+def get_uint_value(kf: Keyfile, group: str, key: str) -> int:
     """
     Return an unsigned integer value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -386,17 +398,17 @@ def get_uint_value(kf: c_void_p, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_uint64()
-    err = libeconf.econf_getUInt64Value(kf, c_group, c_key, byref(c_result))
+    err = libeconf.econf_getUInt64Value(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_uint64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_float_value(kf: c_void_p, group: str, key: str) -> float:
+def get_float_value(kf: Keyfile, group: str, key: str) -> float:
     """
     Return a float value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -404,17 +416,17 @@ def get_float_value(kf: c_void_p, group: str, key: str) -> float:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_double()
-    err = libeconf.econf_getDoubleValue(kf, c_group, c_key, byref(c_result))
+    err = libeconf.econf_getDoubleValue(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_double_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_string_value(kf: c_void_p, group: str, key: str) -> str:
+def get_string_value(kf: Keyfile, group: str, key: str) -> str:
     """
     Return a string value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -422,17 +434,17 @@ def get_string_value(kf: c_void_p, group: str, key: str) -> str:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_char_p()
-    err = libeconf.econf_getStringValue(kf, c_group, c_key, byref(c_result))
+    err = libeconf.econf_getStringValue(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_string_value failed with error: {err_string(err)}")
     return c_result.value.decode("utf-8")
 
 
-def get_bool_value(kf: c_void_p, group: str, key: str) -> bool:
+def get_bool_value(kf: Keyfile, group: str, key: str) -> bool:
     """
     Return a boolean value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -440,17 +452,17 @@ def get_bool_value(kf: c_void_p, group: str, key: str) -> bool:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_bool()
-    err = libeconf.econf_getBoolValue(kf, c_group, c_key, byref(c_result))
+    err = libeconf.econf_getBoolValue(kf.ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_bool_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
+def get_int_value_def(kf: Keyfile, group: str, key: str, default: int) -> int:
     """
     Return an integer value for given group/key or return a default value if key is not found
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -465,7 +477,7 @@ def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
         raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_default = c_int64(default)
     err = libeconf.econf_getInt64ValueDef(
-        kf, c_group, c_key, byref(c_result), c_default
+        kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -474,11 +486,11 @@ def get_int_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
     return c_result.value
 
 
-def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
+def get_uint_value_def(kf: Keyfile, group: str, key: str, default: int) -> int:
     """
     Return an unsigned integer value for given group/key or return a default value if key is not found
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -493,7 +505,7 @@ def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
         raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_default = c_uint64(default)
     err = libeconf.econf_getUInt64ValueDef(
-        kf, c_group, c_key, byref(c_result), c_default
+        kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -502,11 +514,11 @@ def get_uint_value_def(kf: c_void_p, group: str, key: str, default: int) -> int:
     return c_result.value
 
 
-def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> float:
+def get_float_value_def(kf: Keyfile, group: str, key: str, default: float) -> float:
     """
     Return a float value for given group/key or return a default value if key is not found
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -521,7 +533,7 @@ def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> f
         raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_default = c_double(default)
     err = libeconf.econf_getDoubleValueDef(
-        kf, c_group, c_key, byref(c_result), c_default
+        kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -530,11 +542,11 @@ def get_float_value_def(kf: c_void_p, group: str, key: str, default: float) -> f
     return c_result.value
 
 
-def get_string_value_def(kf: c_void_p, group: str, key: str, default: str) -> str:
+def get_string_value_def(kf: Keyfile, group: str, key: str, default: str) -> str:
     """
     Return a string value for given group/key or return a default value if key is not found
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -545,7 +557,7 @@ def get_string_value_def(kf: c_void_p, group: str, key: str, default: str) -> st
     c_result = c_char_p()
     c_default = _encode_str(default)
     err = libeconf.econf_getStringValueDef(
-        kf, c_group, c_key, byref(c_result), c_default
+        kf.ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -554,11 +566,11 @@ def get_string_value_def(kf: c_void_p, group: str, key: str, default: str) -> st
     return c_result.value.decode("utf-8")
 
 
-def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> bool:
+def get_bool_value_def(kf: Keyfile, group: str, key: str, default: bool) -> bool:
     """
     Return a boolean value for given group/key or return a default value if key is not found
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -570,7 +582,7 @@ def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> boo
     if not isinstance(default, bool):
         raise TypeError(f"\"value\" parameter must be of type bool")
     c_default = c_bool(default)
-    err = libeconf.econf_getBoolValueDef(kf, c_group, c_key, byref(c_result), c_default)
+    err = libeconf.econf_getBoolValueDef(kf.ptr, c_group, c_key, byref(c_result), c_default)
     if err:
         if err == 5:
             return c_default.value
@@ -578,11 +590,11 @@ def get_bool_value_def(kf: c_void_p, group: str, key: str, default: bool) -> boo
     return c_result.value
 
 
-def set_int_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
+def set_int_value(kf: Keyfile, group: str, key: str, value: int) -> Econf_err:
     """
     Setting an integer value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -595,17 +607,17 @@ def set_int_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
     if not _check_int_overflow(value):
         raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
     c_value = c_int64(value)
-    err = libeconf.econf_setInt64Value(kf, c_group, c_key, c_value)
+    err = libeconf.econf_setInt64Value(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_int64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_uint_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
+def set_uint_value(kf: Keyfile, group: str, key: str, value: int) -> Econf_err:
     """
     Setting an unsigned integer value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -618,17 +630,17 @@ def set_uint_value(kf: c_void_p, group: str, key: str, value: int) -> Econf_err:
     if not _check_uint_overflow(value):
         raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
     c_value = c_uint64(value)
-    err = libeconf.econf_setUInt64Value(kf, c_group, c_key, c_value)
+    err = libeconf.econf_setUInt64Value(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_uint64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_float_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_err:
+def set_float_value(kf: Keyfile, group: str, key: str, value: float) -> Econf_err:
     """
     Setting a float value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -641,17 +653,17 @@ def set_float_value(kf: c_void_p, group: str, key: str, value: float) -> Econf_e
     if not _check_float_overflow(value):
         raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
     c_value = c_double(value)
-    err = libeconf.econf_setDoubleValue(kf, c_group, c_key, c_value)
+    err = libeconf.econf_setDoubleValue(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_double_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_string_value(kf: c_void_p, group: str, key: str, value: str | bytes) -> Econf_err:
+def set_string_value(kf: Keyfile, group: str, key: str, value: str | bytes) -> Econf_err:
     """
     Setting a string value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -660,17 +672,17 @@ def set_string_value(kf: c_void_p, group: str, key: str, value: str | bytes) -> 
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_value = _encode_str(value)
-    err = libeconf.econf_setStringValue(kf, c_group, c_key, c_value)
+    err = libeconf.econf_setStringValue(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_string_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_bool_value(kf: c_void_p, group: str, key: str, value: bool) -> Econf_err:
+def set_bool_value(kf: Keyfile, group: str, key: str, value: bool) -> Econf_err:
     """
     Setting a boolean value for given group/key
 
-    :param kf: pointer to keyfile
+    :param kf: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -681,7 +693,7 @@ def set_bool_value(kf: c_void_p, group: str, key: str, value: bool) -> Econf_err
     if not isinstance(value, bool):
         raise TypeError(f"\"value\" parameter must be of type bool")
     c_value = c_bool(value)
-    err = libeconf.econf_setBoolValue(kf, c_group, c_key, c_value)
+    err = libeconf.econf_setBoolValue(byref(kf.ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_bool_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -713,12 +725,12 @@ def err_location():
     return c_filename.value, c_line_nr.value
 
 
-def free_file(kf):
+def free_file(kf: Keyfile):
     """
     Free the memory of a given keyfile
 
-    :param kf: pointer to keyfile
+    :param kf: Keyfile to be freed
     :return: None
     """
-    libeconf.econf_freeFile(kf)
+    libeconf.econf_freeFile(kf.ptr)
     return
