@@ -7,11 +7,13 @@ from ctypes import *
 LIBNAME = ctypes.util.find_library("econf")
 LIBECONF = CDLL(LIBNAME)
 
+
 @dataclass
 class EconfFile:
     """
     Class which points to the Key Value storage object
     """
+
     __ptr: c_void_p
 
     def __del__(self):
@@ -122,11 +124,13 @@ def _check_float_overflow(val: float) -> bool:
         raise TypeError("parameter is not a float")
 
 
-def set_value(kf: EconfFile, group: str | bytes, key: str | bytes, value: Any) -> Econf_err:
+def set_value(
+    ef: EconfFile, group: str | bytes, key: str | bytes, value: Any
+) -> Econf_err:
     """
     Dynamically set a value in a keyfile and returns a status code
 
-    :param kf: EconfFile object to set value in
+    :param ef: EconfFile object to set value in
     :param group: group of the key to be changed
     :param key: key to be changed
     :param value: desired value
@@ -134,21 +138,23 @@ def set_value(kf: EconfFile, group: str | bytes, key: str | bytes, value: Any) -
     """
     if isinstance(value, int):
         if value >= 0:
-            res = set_uint_value(kf, group, key, value)
+            res = set_uint_value(ef, group, key, value)
         else:
-            res = set_int_value(kf, group, key, value)
+            res = set_int_value(ef, group, key, value)
     elif isinstance(value, float):
-        res = set_float_value(kf, group, key, value)
+        res = set_float_value(ef, group, key, value)
     elif isinstance(value, str) | isinstance(value, bytes):
-        res = set_string_value(kf, group, key, value)
+        res = set_string_value(ef, group, key, value)
     elif isinstance(value, bool):
-        res = set_bool_value(kf, group, key, value)
+        res = set_bool_value(ef, group, key, value)
     else:
         raise TypeError("'value' parameter is not one of the supported types")
     return res
 
 
-def read_file(file_name: str | bytes, delim: str | bytes, comment: str | bytes) -> EconfFile:
+def read_file(
+    file_name: str | bytes, delim: str | bytes, comment: str | bytes
+) -> EconfFile:
     """
     Read a config file and write the key-value pairs into a keyfile object
 
@@ -176,7 +182,9 @@ def merge_files(usr_file: EconfFile, etc_file: EconfFile) -> EconfFile:
     :return: merged EconfFile object
     """
     merged_file = EconfFile(c_void_p())
-    err = LIBECONF.econf_mergeFiles(byref(merged_file.__ptr), usr_file.__ptr, etc_file.__ptr)
+    err = LIBECONF.econf_mergeFiles(
+        byref(merged_file.__ptr), usr_file.__ptr, etc_file.__ptr
+    )
     if err:
         raise _exceptions(err, f"merge_files failed with error: {err_string(err)}")
     return merged_file
@@ -302,43 +310,43 @@ def new_ini_file() -> EconfFile:
     return result
 
 
-def write_file(kf: EconfFile, save_to_dir: str, file_name: str) -> Econf_err:
+def write_file(ef: EconfFile, save_to_dir: str, file_name: str) -> Econf_err:
     """
     Write content of a keyfile to specified location
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param save_to_dir: directory into which the file has to be written
     :param file_name: filename with suffix of the to be written file
     :return: Error code
     """
     c_save_to_dir = _encode_str(save_to_dir)
     c_file_name = _encode_str(file_name)
-    err = LIBECONF.econf_writeFile(byref(kf.__ptr), c_save_to_dir, c_file_name)
+    err = LIBECONF.econf_writeFile(byref(ef.__ptr), c_save_to_dir, c_file_name)
     return Econf_err(err)
 
 
-def get_path(kf: EconfFile) -> str:
+def get_path(ef: EconfFile) -> str:
     """
     Get the path of the source of the given key file
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :return: path of the config file as string
     """
     # extract from pointer
     LIBECONF.econf_getPath.restype = c_char_p
-    return LIBECONF.econf_getPath(kf.__ptr).decode("utf-8")
+    return LIBECONF.econf_getPath(ef.__ptr).decode("utf-8")
 
 
-def get_groups(kf: EconfFile) -> list[str]:
+def get_groups(ef: EconfFile) -> list[str]:
     """
     List all the groups of given keyfile
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :return: list of groups in the keyfile
     """
     c_length = c_size_t()
     c_groups = c_void_p(None)
-    err = LIBECONF.econf_getGroups(kf.__ptr, byref(c_length), byref(c_groups))
+    err = LIBECONF.econf_getGroups(ef.__ptr, byref(c_length), byref(c_groups))
     if err:
         _exceptions(err, f"get_groups failed with error: {err_string(err)}")
     arr = cast(c_groups, POINTER(c_char_p * c_length.value))
@@ -347,18 +355,18 @@ def get_groups(kf: EconfFile) -> list[str]:
 
 
 # Not passing a group currently leads to ECONF_NOKEY error
-def get_keys(kf: EconfFile, group: str) -> list[str]:
+def get_keys(ef: EconfFile, group: str) -> list[str]:
     """
     List all the keys of a given group or all keys in a keyfile
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: group of the keys to be returned
     :return: list of keys in the given group
     """
     c_length = c_size_t()
     c_keys = c_void_p(None)
     group = _encode_str(group)
-    err = LIBECONF.econf_getKeys(kf.__ptr, group, byref(c_length), byref(c_keys))
+    err = LIBECONF.econf_getKeys(ef.__ptr, group, byref(c_length), byref(c_keys))
     if err:
         _exceptions(err, f"get_keys failed with error: {err_string(err)}")
     arr = cast(c_keys, POINTER(c_char_p * c_length.value))
@@ -366,11 +374,11 @@ def get_keys(kf: EconfFile, group: str) -> list[str]:
     return result
 
 
-def get_int_value(kf: EconfFile, group: str, key: str) -> int:
+def get_int_value(ef: EconfFile, group: str, key: str) -> int:
     """
     Return an integer value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -378,17 +386,17 @@ def get_int_value(kf: EconfFile, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_int64()
-    err = LIBECONF.econf_getInt64Value(kf.__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getInt64Value(ef.__ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_int64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_uint_value(kf: EconfFile, group: str, key: str) -> int:
+def get_uint_value(ef: EconfFile, group: str, key: str) -> int:
     """
     Return an unsigned integer value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -396,17 +404,17 @@ def get_uint_value(kf: EconfFile, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_uint64()
-    err = LIBECONF.econf_getUInt64Value(kf.__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getUInt64Value(ef.__ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_uint64_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_float_value(kf: EconfFile, group: str, key: str) -> float:
+def get_float_value(ef: EconfFile, group: str, key: str) -> float:
     """
     Return a float value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -414,17 +422,17 @@ def get_float_value(kf: EconfFile, group: str, key: str) -> float:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_double()
-    err = LIBECONF.econf_getDoubleValue(kf.__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getDoubleValue(ef.__ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_double_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_string_value(kf: EconfFile, group: str, key: str) -> str:
+def get_string_value(ef: EconfFile, group: str, key: str) -> str:
     """
     Return a string value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -432,17 +440,17 @@ def get_string_value(kf: EconfFile, group: str, key: str) -> str:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_char_p()
-    err = LIBECONF.econf_getStringValue(kf.__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getStringValue(ef.__ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_string_value failed with error: {err_string(err)}")
     return c_result.value.decode("utf-8")
 
 
-def get_bool_value(kf: EconfFile, group: str, key: str) -> bool:
+def get_bool_value(ef: EconfFile, group: str, key: str) -> bool:
     """
     Return a boolean value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :return: value of the key
@@ -450,17 +458,17 @@ def get_bool_value(kf: EconfFile, group: str, key: str) -> bool:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_bool()
-    err = LIBECONF.econf_getBoolValue(kf.__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getBoolValue(ef.__ptr, c_group, c_key, byref(c_result))
     if err:
         _exceptions(err, f"get_bool_value failed with error: {err_string(err)}")
     return c_result.value
 
 
-def get_int_value_def(kf: EconfFile, group: str, key: str, default: int) -> int:
+def get_int_value_def(ef: EconfFile, group: str, key: str, default: int) -> int:
     """
     Return an integer value for given group/key or return a default value if key is not found
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -470,12 +478,14 @@ def get_int_value_def(kf: EconfFile, group: str, key: str, default: int) -> int:
     c_key = _encode_str(key)
     c_result = c_int64()
     if not isinstance(default, int):
-        raise TypeError(f"\"default\" parameter must be of type int")
+        raise TypeError(f'"default" parameter must be of type int')
     if not _check_int_overflow(default):
-        raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
+        raise ValueError(
+            f"Integer overflow found, only up to 64 bit integers are supported"
+        )
     c_default = c_int64(default)
     err = LIBECONF.econf_getInt64ValueDef(
-        kf.__ptr, c_group, c_key, byref(c_result), c_default
+        ef.__ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -484,11 +494,11 @@ def get_int_value_def(kf: EconfFile, group: str, key: str, default: int) -> int:
     return c_result.value
 
 
-def get_uint_value_def(kf: EconfFile, group: str, key: str, default: int) -> int:
+def get_uint_value_def(ef: EconfFile, group: str, key: str, default: int) -> int:
     """
     Return an unsigned integer value for given group/key or return a default value if key is not found
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -498,12 +508,16 @@ def get_uint_value_def(kf: EconfFile, group: str, key: str, default: int) -> int
     c_key = _encode_str(key)
     c_result = c_uint64()
     if not isinstance(default, int) | (default < 0):
-        raise TypeError(f"\"default\" parameter must be of type int and greater or equal to zero")
+        raise TypeError(
+            f'"default" parameter must be of type int and greater or equal to zero'
+        )
     if not _check_uint_overflow(default):
-        raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
+        raise ValueError(
+            f"Integer overflow found, only up to 64 bit unsigned integers are supported"
+        )
     c_default = c_uint64(default)
     err = LIBECONF.econf_getUInt64ValueDef(
-        kf.__ptr, c_group, c_key, byref(c_result), c_default
+        ef.__ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -512,11 +526,11 @@ def get_uint_value_def(kf: EconfFile, group: str, key: str, default: int) -> int
     return c_result.value
 
 
-def get_float_value_def(kf: EconfFile, group: str, key: str, default: float) -> float:
+def get_float_value_def(ef: EconfFile, group: str, key: str, default: float) -> float:
     """
     Return a float value for given group/key or return a default value if key is not found
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -526,12 +540,14 @@ def get_float_value_def(kf: EconfFile, group: str, key: str, default: float) -> 
     c_key = _encode_str(key)
     c_result = c_double()
     if not isinstance(default, float):
-        raise TypeError(f"\"default\" parameter must be of type float")
+        raise TypeError(f'"default" parameter must be of type float')
     if not _check_float_overflow(default):
-        raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
+        raise ValueError(
+            f"Float overflow found, only up to 64 bit floats are supported"
+        )
     c_default = c_double(default)
     err = LIBECONF.econf_getDoubleValueDef(
-        kf.__ptr, c_group, c_key, byref(c_result), c_default
+        ef.__ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -540,11 +556,11 @@ def get_float_value_def(kf: EconfFile, group: str, key: str, default: float) -> 
     return c_result.value
 
 
-def get_string_value_def(kf: EconfFile, group: str, key: str, default: str) -> str:
+def get_string_value_def(ef: EconfFile, group: str, key: str, default: str) -> str:
     """
     Return a string value for given group/key or return a default value if key is not found
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -555,7 +571,7 @@ def get_string_value_def(kf: EconfFile, group: str, key: str, default: str) -> s
     c_result = c_char_p()
     c_default = _encode_str(default)
     err = LIBECONF.econf_getStringValueDef(
-        kf.__ptr, c_group, c_key, byref(c_result), c_default
+        ef.__ptr, c_group, c_key, byref(c_result), c_default
     )
     if err:
         if err == 5:
@@ -564,11 +580,11 @@ def get_string_value_def(kf: EconfFile, group: str, key: str, default: str) -> s
     return c_result.value.decode("utf-8")
 
 
-def get_bool_value_def(kf: EconfFile, group: str, key: str, default: bool) -> bool:
+def get_bool_value_def(ef: EconfFile, group: str, key: str, default: bool) -> bool:
     """
     Return a boolean value for given group/key or return a default value if key is not found
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param default: value to be returned if no key is found
@@ -578,9 +594,11 @@ def get_bool_value_def(kf: EconfFile, group: str, key: str, default: bool) -> bo
     c_key = _encode_str(key)
     c_result = c_bool()
     if not isinstance(default, bool):
-        raise TypeError(f"\"value\" parameter must be of type bool")
+        raise TypeError(f'"value" parameter must be of type bool')
     c_default = c_bool(default)
-    err = LIBECONF.econf_getBoolValueDef(kf.__ptr, c_group, c_key, byref(c_result), c_default)
+    err = LIBECONF.econf_getBoolValueDef(
+        ef.__ptr, c_group, c_key, byref(c_result), c_default
+    )
     if err:
         if err == 5:
             return c_default.value
@@ -588,11 +606,11 @@ def get_bool_value_def(kf: EconfFile, group: str, key: str, default: bool) -> bo
     return c_result.value
 
 
-def set_int_value(kf: EconfFile, group: str, key: str, value: int) -> Econf_err:
+def set_int_value(ef: EconfFile, group: str, key: str, value: int) -> Econf_err:
     """
     Setting an integer value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -601,21 +619,23 @@ def set_int_value(kf: EconfFile, group: str, key: str, value: int) -> Econf_err:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, int):
-        raise TypeError(f"\"value\" parameter must be of type int")
+        raise TypeError(f'"value" parameter must be of type int')
     if not _check_int_overflow(value):
-        raise ValueError(f"Integer overflow found, only up to 64 bit integers are supported")
+        raise ValueError(
+            f"Integer overflow found, only up to 64 bit integers are supported"
+        )
     c_value = c_int64(value)
-    err = LIBECONF.econf_setInt64Value(byref(kf.__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setInt64Value(byref(ef.__ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_int64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_uint_value(kf: EconfFile, group: str, key: str, value: int) -> Econf_err:
+def set_uint_value(ef: EconfFile, group: str, key: str, value: int) -> Econf_err:
     """
     Setting an unsigned integer value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -624,21 +644,25 @@ def set_uint_value(kf: EconfFile, group: str, key: str, value: int) -> Econf_err
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, int) | (value < 0):
-        raise TypeError(f"\"value\" parameter must be of type int and be greater or equal to zero")
+        raise TypeError(
+            f'"value" parameter must be of type int and be greater or equal to zero'
+        )
     if not _check_uint_overflow(value):
-        raise ValueError(f"Integer overflow found, only up to 64 bit unsigned integers are supported")
+        raise ValueError(
+            f"Integer overflow found, only up to 64 bit unsigned integers are supported"
+        )
     c_value = c_uint64(value)
-    err = LIBECONF.econf_setUInt64Value(byref(kf.__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setUInt64Value(byref(ef.__ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_uint64_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_float_value(kf: EconfFile, group: str, key: str, value: float) -> Econf_err:
+def set_float_value(ef: EconfFile, group: str, key: str, value: float) -> Econf_err:
     """
     Setting a float value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -647,21 +671,25 @@ def set_float_value(kf: EconfFile, group: str, key: str, value: float) -> Econf_
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, float):
-        raise TypeError(f"\"value\" parameter must be of type float")
+        raise TypeError(f'"value" parameter must be of type float')
     if not _check_float_overflow(value):
-        raise ValueError(f"Float overflow found, only up to 64 bit floats are supported")
+        raise ValueError(
+            f"Float overflow found, only up to 64 bit floats are supported"
+        )
     c_value = c_double(value)
-    err = LIBECONF.econf_setDoubleValue(byref(kf.__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setDoubleValue(byref(ef.__ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_double_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_string_value(kf: EconfFile, group: str, key: str, value: str | bytes) -> Econf_err:
+def set_string_value(
+    ef: EconfFile, group: str, key: str, value: str | bytes
+) -> Econf_err:
     """
     Setting a string value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -670,17 +698,17 @@ def set_string_value(kf: EconfFile, group: str, key: str, value: str | bytes) ->
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_value = _encode_str(value)
-    err = LIBECONF.econf_setStringValue(byref(kf.__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setStringValue(byref(ef.__ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_string_value failed with error: {err_string(err)}")
     return Econf_err(err)
 
 
-def set_bool_value(kf: EconfFile, group: str, key: str, value: bool) -> Econf_err:
+def set_bool_value(ef: EconfFile, group: str, key: str, value: bool) -> Econf_err:
     """
     Setting a boolean value for given group/key
 
-    :param kf: Key-Value storage object
+    :param ef: Key-Value storage object
     :param group: desired group
     :param key: key of the value that is requested
     :param value: value to be set for given key
@@ -689,9 +717,9 @@ def set_bool_value(kf: EconfFile, group: str, key: str, value: bool) -> Econf_er
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     if not isinstance(value, bool):
-        raise TypeError(f"\"value\" parameter must be of type bool")
+        raise TypeError(f'"value" parameter must be of type bool')
     c_value = c_bool(value)
-    err = LIBECONF.econf_setBoolValue(byref(kf.__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setBoolValue(byref(ef.__ptr), c_group, c_key, c_value)
     if err:
         _exceptions(err, f"set_bool_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -723,12 +751,12 @@ def err_location():
     return c_filename.value, c_line_nr.value
 
 
-def free_file(kf: EconfFile):
+def free_file(ef: EconfFile):
     """
     Free the memory of a given keyfile
 
-    :param kf: EconfFile to be freed
+    :param ef: EconfFile to be freed
     :return: None
     """
-    LIBECONF.econf_freeFile(kf.__ptr)
+    LIBECONF.econf_freeFile(ef.__ptr)
     return
