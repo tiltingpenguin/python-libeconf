@@ -1,3 +1,8 @@
+"""
+Econf provides functionality for interacting with Key-Value config files, like getting and setting values for read config files.
+
+For more information please have a look at the API
+"""
 import ctypes.util
 from enum import Enum
 from dataclasses import dataclass
@@ -167,7 +172,9 @@ def read_file(
     file_name = _encode_str(file_name)
     delim = _encode_str(delim)
     comment = _encode_str(comment)
-    err = LIBECONF.econf_readFile(byref(result._EconfFile__ptr), file_name, delim, comment)
+    err = LIBECONF.econf_readFile(
+        byref(result._EconfFile__ptr), file_name, delim, comment
+    )
     if err:
         raise _exceptions(err, f"read_file failed with error: {err_string(err)}")
     return result
@@ -183,7 +190,9 @@ def merge_files(usr_file: EconfFile, etc_file: EconfFile) -> EconfFile:
     """
     merged_file = EconfFile(c_void_p())
     err = LIBECONF.econf_mergeFiles(
-        byref(merged_file._EconfFile__ptr), usr_file._EconfFile__ptr, etc_file._EconfFile__ptr
+        byref(merged_file._EconfFile__ptr),
+        usr_file._EconfFile__ptr,
+        etc_file._EconfFile__ptr,
     )
     if err:
         raise _exceptions(err, f"merge_files failed with error: {err_string(err)}")
@@ -321,7 +330,9 @@ def write_file(ef: EconfFile, save_to_dir: str, file_name: str) -> Econf_err:
     """
     c_save_to_dir = _encode_str(save_to_dir)
     c_file_name = _encode_str(file_name)
-    err = LIBECONF.econf_writeFile(byref(ef._EconfFile__ptr), c_save_to_dir, c_file_name)
+    err = LIBECONF.econf_writeFile(
+        byref(ef._EconfFile__ptr), c_save_to_dir, c_file_name
+    )
     return Econf_err(err)
 
 
@@ -366,7 +377,9 @@ def get_keys(ef: EconfFile, group: str) -> list[str]:
     c_length = c_size_t()
     c_keys = c_void_p(None)
     group = _encode_str(group)
-    err = LIBECONF.econf_getKeys(ef._EconfFile__ptr, group, byref(c_length), byref(c_keys))
+    err = LIBECONF.econf_getKeys(
+        ef._EconfFile__ptr, group, byref(c_length), byref(c_keys)
+    )
     if err:
         _exceptions(err, f"get_keys failed with error: {err_string(err)}")
     arr = cast(c_keys, POINTER(c_char_p * c_length.value))
@@ -386,7 +399,9 @@ def get_int_value(ef: EconfFile, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_int64()
-    err = LIBECONF.econf_getInt64Value(ef._EconfFile__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getInt64Value(
+        ef._EconfFile__ptr, c_group, c_key, byref(c_result)
+    )
     if err:
         _exceptions(err, f"get_int64_value failed with error: {err_string(err)}")
     return c_result.value
@@ -404,7 +419,9 @@ def get_uint_value(ef: EconfFile, group: str, key: str) -> int:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_uint64()
-    err = LIBECONF.econf_getUInt64Value(ef._EconfFile__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getUInt64Value(
+        ef._EconfFile__ptr, c_group, c_key, byref(c_result)
+    )
     if err:
         _exceptions(err, f"get_uint64_value failed with error: {err_string(err)}")
     return c_result.value
@@ -422,7 +439,9 @@ def get_float_value(ef: EconfFile, group: str, key: str) -> float:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_double()
-    err = LIBECONF.econf_getDoubleValue(ef._EconfFile__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getDoubleValue(
+        ef._EconfFile__ptr, c_group, c_key, byref(c_result)
+    )
     if err:
         _exceptions(err, f"get_double_value failed with error: {err_string(err)}")
     return c_result.value
@@ -440,7 +459,9 @@ def get_string_value(ef: EconfFile, group: str, key: str) -> str:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_char_p()
-    err = LIBECONF.econf_getStringValue(ef._EconfFile__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getStringValue(
+        ef._EconfFile__ptr, c_group, c_key, byref(c_result)
+    )
     if err:
         _exceptions(err, f"get_string_value failed with error: {err_string(err)}")
     return c_result.value.decode("utf-8")
@@ -458,7 +479,9 @@ def get_bool_value(ef: EconfFile, group: str, key: str) -> bool:
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_result = c_bool()
-    err = LIBECONF.econf_getBoolValue(ef._EconfFile__ptr, c_group, c_key, byref(c_result))
+    err = LIBECONF.econf_getBoolValue(
+        ef._EconfFile__ptr, c_group, c_key, byref(c_result)
+    )
     if err:
         _exceptions(err, f"get_bool_value failed with error: {err_string(err)}")
     return c_result.value
@@ -625,7 +648,9 @@ def set_int_value(ef: EconfFile, group: str, key: str, value: int) -> Econf_err:
             f"Integer overflow found, only up to 64 bit integers are supported"
         )
     c_value = c_int64(value)
-    err = LIBECONF.econf_setInt64Value(byref(ef._EconfFile__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setInt64Value(
+        byref(ef._EconfFile__ptr), c_group, c_key, c_value
+    )
     if err:
         _exceptions(err, f"set_int64_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -652,7 +677,9 @@ def set_uint_value(ef: EconfFile, group: str, key: str, value: int) -> Econf_err
             f"Integer overflow found, only up to 64 bit unsigned integers are supported"
         )
     c_value = c_uint64(value)
-    err = LIBECONF.econf_setUInt64Value(byref(ef._EconfFile__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setUInt64Value(
+        byref(ef._EconfFile__ptr), c_group, c_key, c_value
+    )
     if err:
         _exceptions(err, f"set_uint64_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -677,7 +704,9 @@ def set_float_value(ef: EconfFile, group: str, key: str, value: float) -> Econf_
             f"Float overflow found, only up to 64 bit floats are supported"
         )
     c_value = c_double(value)
-    err = LIBECONF.econf_setDoubleValue(byref(ef._EconfFile__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setDoubleValue(
+        byref(ef._EconfFile__ptr), c_group, c_key, c_value
+    )
     if err:
         _exceptions(err, f"set_double_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -698,7 +727,9 @@ def set_string_value(
     c_group = _encode_str(group)
     c_key = _encode_str(key)
     c_value = _encode_str(value)
-    err = LIBECONF.econf_setStringValue(byref(ef._EconfFile__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setStringValue(
+        byref(ef._EconfFile__ptr), c_group, c_key, c_value
+    )
     if err:
         _exceptions(err, f"set_string_value failed with error: {err_string(err)}")
     return Econf_err(err)
@@ -719,7 +750,9 @@ def set_bool_value(ef: EconfFile, group: str, key: str, value: bool) -> Econf_er
     if not isinstance(value, bool):
         raise TypeError(f'"value" parameter must be of type bool')
     c_value = c_bool(value)
-    err = LIBECONF.econf_setBoolValue(byref(ef._EconfFile__ptr), c_group, c_key, c_value)
+    err = LIBECONF.econf_setBoolValue(
+        byref(ef._EconfFile__ptr), c_group, c_key, c_value
+    )
     if err:
         _exceptions(err, f"set_bool_value failed with error: {err_string(err)}")
     return Econf_err(err)

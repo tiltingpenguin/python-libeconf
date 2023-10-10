@@ -1,8 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-econf.egg-info/PKG-INFO
-econf.egg-info/SOURCES.txt
-econf.egg-info/dependency_links.txt
-econf.egg-info/top_level.txt
-tests/test.py
