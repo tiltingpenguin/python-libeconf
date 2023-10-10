@@ -365,18 +365,18 @@ def get_groups(ef: EconfFile) -> list[str]:
     return result
 
 
-# Not passing a group currently leads to ECONF_NOKEY error
 def get_keys(ef: EconfFile, group: str) -> list[str]:
     """
     List all the keys of a given group or all keys in a keyfile
 
     :param ef: Key-Value storage object
-    :param group: group of the keys to be returned
+    :param group: group of the keys to be returned or None for keys without a group
     :return: list of keys in the given group
     """
     c_length = c_size_t()
     c_keys = c_void_p(None)
-    group = _encode_str(group)
+    if group:
+        group = _encode_str(group)
     err = LIBECONF.econf_getKeys(
         ef._EconfFile__ptr, group, byref(c_length), byref(c_keys)
     )
