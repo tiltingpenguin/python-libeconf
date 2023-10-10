@@ -297,7 +297,7 @@ def new_key_file(delim: str | bytes, comment: str | bytes) -> EconfFile:
     :param comment: string that defines the start of a comment e.g. '#'
     :return: created EconfFile object
     """
-    result = EconfFile(c_void_p)
+    result = EconfFile(c_void_p())
     delim = _encode_str(delim)
     comment = _encode_str(comment)
     err = LIBECONF.econf_newKeyFile(byref(result._EconfFile__ptr), delim, comment)
