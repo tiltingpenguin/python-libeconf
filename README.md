@@ -8,7 +8,3 @@ It reads configuration file snippets from different directories and builds the f
 the application from it.
 
 You can find our documentation ***[here](https://tiltingpenguin.github.io/python-libeconf/index.html)***.
-
-```
-   This project is still under development
-```
