@@ -46,7 +46,7 @@ def test_read_file():
 
     ef = econf.read_file(file, delim, comment)
 
-    assert ef._EconfFile__ptr != None
+    assert ef._ptr != None
 
 
 def test_new_key_file():
