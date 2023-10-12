@@ -22,6 +22,7 @@ Contents
 
 .. toctree::
 
+   generated/econf
    usage
    api
 
