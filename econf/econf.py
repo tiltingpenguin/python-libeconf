@@ -130,7 +130,7 @@ def _ensure_valid_uint(val: int) -> int:
 
 
 def set_value(
-    ef: EconfFile, group: str | bytes, key: str | bytes, value: Any
+    ef: EconfFile, group: str | bytes, key: str | bytes, value: int | float | str | bool
 ) -> None:
     """
     Dynamically set a value in a keyfile and returns a status code
@@ -315,6 +315,36 @@ def new_ini_file() -> EconfFile:
     if err:
         raise _exceptions(err, f"new_ini_file failed with error: {err_string(err)}")
     return result
+
+
+def comment_tag(ef: EconfFile) -> str:
+    LIBECONF.econf_comment_tag.restype = c_char
+    result = LIBECONF.econf_comment_tag(ef._ptr)
+    return result.decode("utf-8")
+
+
+def delimiter_tag(ef: EconfFile) -> str:
+    LIBECONF.econf_delimiter_tag.restype = c_char
+    result = LIBECONF.econf_delimiter_tag(ef._ptr)
+    return result.decode("utf-8")
+
+
+def set_comment_tag(ef: EconfFile, comment: str | bytes) -> None:
+    comment = _encode_str(comment)
+    if len(comment) > 1:
+        raise ValueError("Only single characters are allowed")
+    c_comment = c_char(comment)
+    LIBECONF.econf_set_comment_tag(ef._ptr, c_comment)
+    return
+
+
+def set_delimiter_tag(ef: EconfFile, delimiter: str | bytes) -> None:
+    delimiter = _encode_str(delimiter)
+    if len(delimiter) > 1:
+        raise ValueError("Only single characters are allowed")
+    c_delimiter = c_char(delimiter)
+    LIBECONF.econf_set_delimiter_tag(ef._ptr, c_delimiter)
+    return
 
 
 def write_file(ef: EconfFile, save_to_dir: str, file_name: str) -> None:
@@ -669,9 +699,7 @@ def set_float_value(ef: EconfFile, group: str, key: str, value: float) -> None:
     return
 
 
-def set_string_value(
-    ef: EconfFile, group: str, key: str, value: str | bytes
-) -> None:
+def set_string_value(ef: EconfFile, group: str, key: str, value: str | bytes) -> None:
     """
     Setting a string value for given group/key
 
@@ -746,5 +774,23 @@ def free_file(ef: EconfFile):
     :param ef: EconfFile to be freed
     :return: None
     """
+    if not ef._ptr:
+        return
     LIBECONF.econf_freeFile(ef._ptr)
+    return
+
+
+def set_conf_dirs(dir_postfix_list: list[str]) -> None:
+    if type(dir_postfix_list) != list:
+        raise TypeError("Directories must be passed as a list of strings")
+    if len(dir_postfix_list) == 0:
+        return
+    str_arr = c_char_p * len(dir_postfix_list)
+    dir_arr = str_arr()
+    for i in range(len(dir_postfix_list)):
+        dir_arr[i] = c_char_p(_encode_str(dir_postfix_list[i]))
+    err = LIBECONF.econf_set_conf_dirs(dir_arr)
+    print(err)
+    if err:
+        _exceptions(err, f"set_conf_dirs failed with error: {err_string(err)}")
     return
