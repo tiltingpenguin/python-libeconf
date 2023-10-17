@@ -5,8 +5,8 @@ from pathlib import Path
 from ctypes import *
 
 
-FILE = econf.read_file("examples/example.conf", "=", ";")
-FILE2 = econf.read_file("examples/example2.conf", "=", "#")
+FILE = econf.read_file("test/testdata/examples/example.conf", "=", ";")
+FILE2 = econf.read_file("test/testdata/examples2/example.conf", "=", "#")
 
 
 @contextmanager

@@ -5,8 +5,9 @@ from pathlib import Path
 from ctypes import *
 
 
-FILE = econf.read_file("examples/example.conf", "=", ";")
-FILE2 = econf.read_file("examples/example2.conf", "=", "#")
+FILE = econf.read_file("test/testdata/examples/example.conf", "=", ";")
+FILE2 = econf.read_file("test/testdata/examples2/example.conf", "=", "#")
+INVALID_FILE = econf.read_file("test/testdata/examples/invalid.conf", ":", "#")
 
 
 @contextmanager
@@ -61,7 +62,7 @@ def test_ensure_valid_uint(value, context):
 
 
 def test_read_file():
-    file = "examples/example.conf"
+    file = "test/testdata/examples/example.conf"
     delim = "="
     comment = "#"
 
@@ -92,14 +93,83 @@ def test_merge_files():
     assert len(econf.get_groups(result)) == 3
 
 
-@pytest.mark.skip
 def test_read_dirs():
-    pass
+    result = econf.read_dirs("test/testdata/examples2/", "test/testdata/examples/", "example", "conf", "=", "#")
+
+    assert len(econf.get_keys(result, None)) == 3
+    assert len(econf.get_keys(result, "Group")) == 4
+    assert len(econf.get_groups(result)) == 3
 
 
-@pytest.mark.skip
 def test_read_dirs_history():
-    pass
+    result = econf.read_dirs_history("test/testdata/examples2/", "test/testdata/examples/", "example", "conf", "=", "#")
+
+    assert len(result) == 2
+    assert len(econf.get_groups(result[0])) == 3
+    assert len(econf.get_keys(result[0], None)) == 2
+    assert len(econf.get_groups(result[1])) == 1
+
+
+@pytest.mark.parametrize(
+    "ef,context,expected",
+    [
+        (FILE, does_not_raise(), ";"),
+        (FILE2, does_not_raise(), "#"),
+        (INVALID_FILE, does_not_raise(), "#")
+    ]
+)
+def test_comment_tag(ef, context, expected):
+    with context:
+        result = econf.comment_tag(ef)
+
+        assert result == expected
+
+
+@pytest.mark.parametrize(
+    "ef,context,expected",
+    [
+        (FILE, does_not_raise(), "="),
+        (FILE2, does_not_raise(), "="),
+        (INVALID_FILE, does_not_raise(), ":")
+    ]
+)
+def test_delimiter_tag(ef, context, expected):
+    with context:
+        result = econf.delimiter_tag(ef)
+
+        assert result == expected
+
+
+@pytest.mark.parametrize(
+    "ef,context,expected",
+    [
+        (FILE, does_not_raise(), "/"),
+        (FILE, pytest.raises(TypeError), 1),
+        (FILE, pytest.raises(ValueError), "abc")
+    ]
+)
+def test_set_comment_tag(ef, context, expected):
+    with context:
+        econf.set_comment_tag(ef, expected)
+        result = econf.comment_tag(ef)
+
+        assert result == expected
+
+
+@pytest.mark.parametrize(
+    "ef,context, expected",
+    [
+        (FILE, does_not_raise(), ":"),
+        (FILE, pytest.raises(TypeError), 1),
+        (FILE, pytest.raises(ValueError), "abc")
+    ]
+)
+def test_set_delimiter_tag(ef, context, expected):
+    with context:
+        econf.set_delimiter_tag(ef, expected)
+        result = econf.delimiter_tag(ef)
+
+        assert result == expected
 
 
 def test_write_file(tmp_path):
