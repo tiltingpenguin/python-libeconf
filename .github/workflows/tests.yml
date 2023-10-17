@@ -21,5 +21,8 @@ jobs:
       with:
         python-version: 3.x
 
+    - name: Install dependencies
+      run: pip install .[test_requires]
+
     - name: Run tests
-      run: pytest -v tests/
+      run: pytest -v test/
