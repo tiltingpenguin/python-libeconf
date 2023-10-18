@@ -83,7 +83,13 @@ def test_get_float_value_def(file, context, group, key, expected):
     "file,context,group,key,expected",
     [
         (FILE, does_not_raise(), "Group", "Welcome", "Hello"),
-        (FILE, does_not_raise(), "First Group", "Name", "Keys File Example\\tthis value shows\\nescaping"),
+        (
+            FILE,
+            does_not_raise(),
+            "First Group",
+            "Name",
+            "Keys File Example\\tthis value shows\\nescaping",
+        ),
         (FILE, does_not_raise(), "First Group", "Welcome[de]", "Hallo"),
         (FILE, does_not_raise(), "Group", "Bla", "12311"),
         (FILE, does_not_raise(), None, "foo", "6.5"),
@@ -91,8 +97,8 @@ def test_get_float_value_def(file, context, group, key, expected):
         (FILE, does_not_raise(), "Group", "foo", "default"),
         (FILE, pytest.raises(TypeError), 7, 2, 12311),
         (FILE, pytest.raises(TypeError), "Group", "Welcome", 7),
-        (FILE, pytest.raises(TypeError), "Group", "Invalid Key", 7)
-    ]
+        (FILE, pytest.raises(TypeError), "Group", "Invalid Key", 7),
+    ],
 )
 def test_get_string_value_def(file, context, group, key, expected):
     with context:
@@ -112,7 +118,7 @@ def test_get_string_value_def(file, context, group, key, expected):
         (FILE, pytest.raises(TypeError), 7, 2, 12311),
         (FILE, pytest.raises(TypeError), "Another Group", "Booleans", 12311),
         (FILE, pytest.raises(TypeError), "Another Group", "Bools", 12311),
-    ]
+    ],
 )
 def test_get_bool_value_def(file, context, group, key, expected):
     with context:

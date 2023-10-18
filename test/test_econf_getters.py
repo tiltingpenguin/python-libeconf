@@ -27,16 +27,16 @@ def test_get_groups(file, context, example):
 
 
 @pytest.mark.parametrize(
-    "file,context,group,expected", 
+    "file,context,group,expected",
     [
-        (FILE, does_not_raise(), "Group", 3), 
-        (FILE, does_not_raise(), None, 2), 
+        (FILE, does_not_raise(), "Group", 3),
+        (FILE, does_not_raise(), None, 2),
         (FILE2, does_not_raise(), None, 2),
         (FILE, pytest.raises(TypeError), 1, 0),
-        (FILE, pytest.raises(KeyError), "a", 0)
-    ]
+        (FILE, pytest.raises(KeyError), "a", 0),
+    ],
 )
-def test_get_keys(file,context, group, expected):
+def test_get_keys(file, context, group, expected):
     with context:
         result = econf.get_keys(file, group)
 
@@ -106,14 +106,20 @@ def test_get_float_value(file, context, group, key, expected):
     "file,context,group,key,expected",
     [
         (FILE, does_not_raise(), "Group", "Welcome", "Hello"),
-        (FILE, does_not_raise(), "First Group", "Name", "Keys File Example\\tthis value shows\\nescaping"),
+        (
+            FILE,
+            does_not_raise(),
+            "First Group",
+            "Name",
+            "Keys File Example\\tthis value shows\\nescaping",
+        ),
         (FILE, does_not_raise(), "First Group", "Welcome[de]", "Hallo"),
         (FILE, does_not_raise(), "Group", "Bla", "12311"),
         (FILE, does_not_raise(), None, "foo", "6.5"),
         (FILE, pytest.raises(KeyError), "a", "Bla", "12311"),
         (FILE, pytest.raises(KeyError), "Group", "foo", "6.5"),
-        (FILE, pytest.raises(TypeError), 7, 2, "12311")
-    ]
+        (FILE, pytest.raises(TypeError), 7, 2, "12311"),
+    ],
 )
 def test_get_string_value(file, context, group, key, expected):
     with context:
@@ -131,7 +137,7 @@ def test_get_string_value(file, context, group, key, expected):
         (FILE, pytest.raises(KeyError), "a", "Booleans", True),
         (FILE, pytest.raises(KeyError), "Another Group", "Bools", True),
         (FILE, pytest.raises(TypeError), 7, 2, 12311),
-    ]
+    ],
 )
 def test_get_bool_value(file, context, group, key, expected):
     with context:

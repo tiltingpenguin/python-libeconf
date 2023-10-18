@@ -24,8 +24,8 @@ def does_not_raise():
         (FILE, does_not_raise(), "New Group", "Bla", 1),
         (FILE, pytest.raises(TypeError), 7, 2, 1),
         (FILE, pytest.raises(TypeError), "Group", "Bla", "Invalid Value"),
-        (FILE, pytest.raises(TypeError), "Invalid Group", "Bla", "Invalid Value")
-    ]
+        (FILE, pytest.raises(TypeError), "Invalid Group", "Bla", "Invalid Value"),
+    ],
 )
 def test_set_int_value(file, context, group, key, value):
     with context:
@@ -46,8 +46,8 @@ def test_set_int_value(file, context, group, key, value):
         (FILE, pytest.raises(ValueError), "Group", "Bla", 99999999999999999999),
         (FILE, pytest.raises(TypeError), 7, 2, 1),
         (FILE, pytest.raises(TypeError), "Group", "Bla", "Invalid Value"),
-        (FILE, pytest.raises(TypeError), "Invalid Group", "Bal", "Invalid Value")
-    ]
+        (FILE, pytest.raises(TypeError), "Invalid Group", "Bal", "Invalid Value"),
+    ],
 )
 def test_set_uint_value(file, context, group, key, value):
     with context:
@@ -66,8 +66,8 @@ def test_set_uint_value(file, context, group, key, value):
         (FILE, does_not_raise(), "Group", "Bla", -1.5),
         (FILE, pytest.raises(TypeError), 7, 2, 1),
         (FILE, pytest.raises(TypeError), "Group", "Bla", "Invalid Value"),
-        (FILE, pytest.raises(TypeError), "Group", "Bla", 1)
-    ]
+        (FILE, pytest.raises(TypeError), "Group", "Bla", 1),
+    ],
 )
 def test_set_float_value(file, context, group, key, value):
     with context:
@@ -86,8 +86,8 @@ def test_set_float_value(file, context, group, key, value):
         (FILE, does_not_raise(), "First Group", "Name", "\nNoname"),
         (FILE, pytest.raises(TypeError), 7, 2, 1),
         (FILE, pytest.raises(TypeError), "Group", "Bla", 1.5),
-        (FILE, pytest.raises(TypeError), "Group", "Bla", True)
-    ]
+        (FILE, pytest.raises(TypeError), "Group", "Bla", True),
+    ],
 )
 def test_set_string_value(file, context, group, key, value):
     with context:
@@ -105,8 +105,8 @@ def test_set_string_value(file, context, group, key, value):
         (FILE, does_not_raise(), "New Group", "Welcome", True),
         (FILE, pytest.raises(TypeError), 7, 2, 1),
         (FILE, pytest.raises(TypeError), "Group", "Bla", "Invalid Value"),
-        (FILE, pytest.raises(TypeError), "Group", "Bla", "")
-    ]
+        (FILE, pytest.raises(TypeError), "Group", "Bla", ""),
+    ],
 )
 def test_set_bool_value(file, context, group, key, value):
     with context:
@@ -114,4 +114,3 @@ def test_set_bool_value(file, context, group, key, value):
         result = econf.get_bool_value(file, group, key)
 
         assert result == value
-

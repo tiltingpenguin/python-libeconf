@@ -94,7 +94,14 @@ def test_merge_files():
 
 
 def test_read_dirs():
-    result = econf.read_dirs("test/testdata/examples2/", "test/testdata/examples/", "example", "conf", "=", "#")
+    result = econf.read_dirs(
+        "test/testdata/examples2/",
+        "test/testdata/examples/",
+        "example",
+        "conf",
+        "=",
+        "#",
+    )
 
     assert len(econf.get_keys(result, None)) == 3
     assert len(econf.get_keys(result, "Group")) == 4
@@ -102,7 +109,14 @@ def test_read_dirs():
 
 
 def test_read_dirs_history():
-    result = econf.read_dirs_history("test/testdata/examples2/", "test/testdata/examples/", "example", "conf", "=", "#")
+    result = econf.read_dirs_history(
+        "test/testdata/examples2/",
+        "test/testdata/examples/",
+        "example",
+        "conf",
+        "=",
+        "#",
+    )
 
     assert len(result) == 2
     assert len(econf.get_groups(result[0])) == 3
@@ -115,8 +129,8 @@ def test_read_dirs_history():
     [
         (FILE, does_not_raise(), ";"),
         (FILE2, does_not_raise(), "#"),
-        (INVALID_FILE, does_not_raise(), "#")
-    ]
+        (INVALID_FILE, does_not_raise(), "#"),
+    ],
 )
 def test_comment_tag(ef, context, expected):
     with context:
@@ -130,8 +144,8 @@ def test_comment_tag(ef, context, expected):
     [
         (FILE, does_not_raise(), "="),
         (FILE2, does_not_raise(), "="),
-        (INVALID_FILE, does_not_raise(), ":")
-    ]
+        (INVALID_FILE, does_not_raise(), ":"),
+    ],
 )
 def test_delimiter_tag(ef, context, expected):
     with context:
@@ -145,8 +159,8 @@ def test_delimiter_tag(ef, context, expected):
     [
         (FILE, does_not_raise(), "/"),
         (FILE, pytest.raises(TypeError), 1),
-        (FILE, pytest.raises(ValueError), "abc")
-    ]
+        (FILE, pytest.raises(ValueError), "abc"),
+    ],
 )
 def test_set_comment_tag(ef, context, expected):
     with context:
@@ -161,8 +175,8 @@ def test_set_comment_tag(ef, context, expected):
     [
         (FILE, does_not_raise(), ":"),
         (FILE, pytest.raises(TypeError), 1),
-        (FILE, pytest.raises(ValueError), "abc")
-    ]
+        (FILE, pytest.raises(ValueError), "abc"),
+    ],
 )
 def test_set_delimiter_tag(ef, context, expected):
     with context:
