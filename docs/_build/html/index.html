@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="econf" href="generated/econf.html" /> 
+    <link rel="next" title="Usage" href="usage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,7 +42,6 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="generated/econf.html">econf</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
@@ -78,15 +77,10 @@
 <p>libeconf is a highly flexible and configurable library to parse and manage key=value configuration files.
 It reads configuration file snippets from different directories and builds the final configuration file for
 the application from it.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This project is still under development</p>
-</div>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="generated/econf.html">econf</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#install">install</a></li>
 </ul>
@@ -94,12 +88,20 @@ the application from it.</p>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#functions-to-interact-with-config-files">Functions to interact with config files</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.read_file_with_callback"><code class="docutils literal notranslate"><span class="pre">read_file_with_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.new_key_file"><code class="docutils literal notranslate"><span class="pre">new_key_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.new_ini_file"><code class="docutils literal notranslate"><span class="pre">new_ini_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.merge_files"><code class="docutils literal notranslate"><span class="pre">merge_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.read_dirs"><code class="docutils literal notranslate"><span class="pre">read_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.read_dirs_with_callback"><code class="docutils literal notranslate"><span class="pre">read_dirs_with_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.read_dirs_history"><code class="docutils literal notranslate"><span class="pre">read_dirs_history()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.read_dirs_history_with_callback"><code class="docutils literal notranslate"><span class="pre">read_dirs_history_with_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.comment_tag"><code class="docutils literal notranslate"><span class="pre">comment_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.set_comment_tag"><code class="docutils literal notranslate"><span class="pre">set_comment_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.delimiter_tag"><code class="docutils literal notranslate"><span class="pre">delimiter_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.set_delimiter_tag"><code class="docutils literal notranslate"><span class="pre">set_delimiter_tag()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.write_file"><code class="docutils literal notranslate"><span class="pre">write_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.get_path"><code class="docutils literal notranslate"><span class="pre">get_path()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#functions-for-getting-values">Functions for getting values</a><ul>
@@ -121,6 +123,7 @@ the application from it.</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#functions-for-setting-values">Functions for setting values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#econf.set_value"><code class="docutils literal notranslate"><span class="pre">set_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.set_int_value"><code class="docutils literal notranslate"><span class="pre">set_int_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.set_uint_value"><code class="docutils literal notranslate"><span class="pre">set_uint_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#econf.set_float_value"><code class="docutils literal notranslate"><span class="pre">set_float_value()</span></code></a></li>
@@ -142,21 +145,13 @@ the application from it.</p>
 </ul>
 </div>
 </section>
-<section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="generated/econf.html" class="btn btn-neutral float-right" title="econf" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

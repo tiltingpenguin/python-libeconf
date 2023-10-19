@@ -42,17 +42,24 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="generated/econf.html">econf</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#functions-to-interact-with-config-files">Functions to interact with config files</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#econf.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.read_file_with_callback"><code class="docutils literal notranslate"><span class="pre">read_file_with_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.new_key_file"><code class="docutils literal notranslate"><span class="pre">new_key_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.new_ini_file"><code class="docutils literal notranslate"><span class="pre">new_ini_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.merge_files"><code class="docutils literal notranslate"><span class="pre">merge_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.read_dirs"><code class="docutils literal notranslate"><span class="pre">read_dirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.read_dirs_with_callback"><code class="docutils literal notranslate"><span class="pre">read_dirs_with_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.read_dirs_history"><code class="docutils literal notranslate"><span class="pre">read_dirs_history()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.read_dirs_history_with_callback"><code class="docutils literal notranslate"><span class="pre">read_dirs_history_with_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.comment_tag"><code class="docutils literal notranslate"><span class="pre">comment_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_comment_tag"><code class="docutils literal notranslate"><span class="pre">set_comment_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.delimiter_tag"><code class="docutils literal notranslate"><span class="pre">delimiter_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_delimiter_tag"><code class="docutils literal notranslate"><span class="pre">set_delimiter_tag()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.write_file"><code class="docutils literal notranslate"><span class="pre">write_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#econf.get_path"><code class="docutils literal notranslate"><span class="pre">get_path()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#functions-for-getting-values">Functions for getting values</a><ul>
@@ -74,6 +81,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#functions-for-setting-values">Functions for setting values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#econf.set_value"><code class="docutils literal notranslate"><span class="pre">set_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.set_int_value"><code class="docutils literal notranslate"><span class="pre">set_int_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.set_uint_value"><code class="docutils literal notranslate"><span class="pre">set_uint_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#econf.set_float_value"><code class="docutils literal notranslate"><span class="pre">set_float_value()</span></code></a></li>
@@ -136,6 +144,28 @@
 <li><p><strong>file_name</strong> – absolute path of file to be parsed</p></li>
 <li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
 <li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Key-Value storage object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.read_file_with_callback">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_file_with_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EconfFile</span></span></span><a class="headerlink" href="#econf.read_file_with_callback" title="Link to this definition"></a></dt>
+<dd><p>Read a config file and write the key-value pairs into a keyfile object</p>
+<p>A user defined function will be called in order e.g. to check the correct file permissions.
+If the function returns False the parsing will be aborted and an Exception will be raised</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – absolute path of file to be parsed</p></li>
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+<li><p><strong>callback</strong> – User defined function which will be called and returns a boolean</p></li>
+<li><p><strong>callback_data</strong> – argument to be give to the callback function</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -213,6 +243,33 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="econf.read_dirs_with_callback">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_dirs_with_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etc_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EconfFile</span></span></span><a class="headerlink" href="#econf.read_dirs_with_callback" title="Link to this definition"></a></dt>
+<dd><p>Read configuration from the first found config file and merge with snippets from conf.d/ directory</p>
+<p>For every file a user defined function will be called in order e.g. to check the correct file permissions.
+If the function returns False the parsing will be aborted and an Exception will be raised</p>
+<p>e.g. searches /usr/etc/ and /etc/ for an example.conf file and merges it with the snippets in either
+/usr/etc/example.conf.d/ or /etc/example.conf.d</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>usr_conf_dir</strong> – absolute path of the first directory to be searched</p></li>
+<li><p><strong>etc_conf_dir</strong> – absolute path of the second directory to be searched</p></li>
+<li><p><strong>project_name</strong> – basename of the configuration file</p></li>
+<li><p><strong>config_suffix</strong> – suffix of the configuration file</p></li>
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+<li><p><strong>callback</strong> – User defined function which will be called for each file and returns a boolean</p></li>
+<li><p><strong>callback_data</strong> – argument to be give to the callback function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>merged EconfFile object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="econf.read_dirs_history">
 <span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_dirs_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etc_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">EconfFile</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#econf.read_dirs_history" title="Link to this definition"></a></dt>
 <dd><p>Read configuration from the first found config file and snippets from conf.d/ directory</p>
@@ -236,6 +293,95 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="econf.read_dirs_history_with_callback">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">read_dirs_history_with_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usr_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etc_conf_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EconfFile</span></span></span><a class="headerlink" href="#econf.read_dirs_history_with_callback" title="Link to this definition"></a></dt>
+<dd><p>Read configuration from the first found config file and snippets from conf.d/ directory</p>
+<p>For every file a user defined function will be called in order e.g. to check the correct file permissions.
+If the function returns False the parsing will be aborted and an Exception will be raised</p>
+<p>e.g. searches /usr/etc/ and /etc/ for an example.conf file and the snippets in either
+/usr/etc/example.conf.d/ or /etc/example.conf.d</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>usr_conf_dir</strong> – absolute path of the first directory to be searched</p></li>
+<li><p><strong>etc_conf_dir</strong> – absolute path of the second directory to be searched</p></li>
+<li><p><strong>project_name</strong> – basename of the configuration file</p></li>
+<li><p><strong>config_suffix</strong> – suffix of the configuration file</p></li>
+<li><p><strong>delim</strong> – delimiter of a key/value e.g. ‘=’</p></li>
+<li><p><strong>comment</strong> – string that defines the start of a comment e.g. ‘#’</p></li>
+<li><p><strong>callback</strong> – User defined function which will be called for each file and returns a boolean</p></li>
+<li><p><strong>callback_data</strong> – argument to be give to the callback function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of EconfFile objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.comment_tag">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">comment_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#econf.comment_tag" title="Link to this definition"></a></dt>
+<dd><p>Get the comment tag of the specified EconfFile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ef</strong> – Key-Value storage object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The comment tag of the EconfFile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_comment_tag">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_comment_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#econf.set_comment_tag" title="Link to this definition"></a></dt>
+<dd><p>Set the comment tag of the specified EconfFile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ef</strong> – Key-Value storage object</p></li>
+<li><p><strong>comment</strong> – The desired comment tag character</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.delimiter_tag">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">delimiter_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#econf.delimiter_tag" title="Link to this definition"></a></dt>
+<dd><p>Get the delimiter tag of the specified EconfFile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ef</strong> – Key-Value storage object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the delimiter tag of the EconfFile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_delimiter_tag">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_delimiter_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#econf.set_delimiter_tag" title="Link to this definition"></a></dt>
+<dd><p>Set the delimiter tag of the specified EconfFile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ef</strong> – Key-Value storage object</p></li>
+<li><p><strong>delimiter</strong> – The desired delimiter character</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="econf.write_file">
 <span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">write_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_to_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#econf.write_file" title="Link to this definition"></a></dt>
 <dd><p>Write content of a keyfile to specified location</p>
@@ -249,6 +395,20 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.get_path">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#econf.get_path" title="Link to this definition"></a></dt>
+<dd><p>Get the path of the source of the given key file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ef</strong> – Key-Value storage object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>path of the config file as string</p>
 </dd>
 </dl>
 </dd></dl>
@@ -478,6 +638,25 @@
 </section>
 <section id="functions-for-setting-values">
 <h2>Functions for setting values<a class="headerlink" href="#functions-for-setting-values" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="econf.set_value">
+<span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#econf.set_value" title="Link to this definition"></a></dt>
+<dd><p>Dynamically set a value in a keyfile and returns a status code</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ef</strong> – EconfFile object to set value in</p></li>
+<li><p><strong>group</strong> – group of the key to be changed</p></li>
+<li><p><strong>key</strong> – key to be changed</p></li>
+<li><p><strong>value</strong> – desired value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="econf.set_int_value">
 <span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">set_int_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#econf.set_int_value" title="Link to this definition"></a></dt>
