@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - bindings/python3/*
 
 jobs:
   test:

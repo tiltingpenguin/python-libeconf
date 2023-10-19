@@ -13,23 +13,12 @@ libeconf is a highly flexible and configurable library to parse and manage key=v
 It reads configuration file snippets from different directories and builds the final configuration file for
 the application from it.
 
-.. note::
-   This project is still under development
-
 
 Contents
 --------
 
 .. toctree::
 
-   generated/econf
    usage
    api
 
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

@@ -5,7 +5,9 @@ install
 -------
 
 .. warning::
-    Right now we do not provide libeconf included in the project. To use this project please make sure you have libeconf installed on your system!
+    The recommended way to install this project is to get the rpm package.
+    If you install this project from pypi libeconf will not be automatically installed. 
+    To use this project please make sure you have libeconf installed on your system!
 
 .. note::
     The package is not yet published on pypi. This is coming soon.
