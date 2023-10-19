@@ -210,8 +210,7 @@ def read_file_with_callback(
     comment = _ensure_valid_char(comment)
 
     def callback_proxy(fake_data: c_void_p) -> c_bool:
-        res = callback(callback_data)
-        return c_bool(res)
+        return callback(callback_data)
 
     CBFUNC = CFUNCTYPE(c_bool, c_void_p)
     cb_func = CBFUNC(callback_proxy)
@@ -325,9 +324,8 @@ def read_dirs_with_callback(
     delim = _ensure_valid_char(delim)
     comment = _ensure_valid_char(comment)
 
-    def callback_proxy(fake_data: c_void_p) -> c_bool:
-        res = callback(callback_data)
-        return c_bool(res)
+    def callback_proxy(fake_data: c_void_p):
+        return callback(callback_data)
 
     CBFUNC = CFUNCTYPE(c_bool, c_void_p)
     cb_func = CBFUNC(callback_proxy)
@@ -436,9 +434,8 @@ def read_dirs_history_with_callback(
     delim = _ensure_valid_char(delim)
     comment = _ensure_valid_char(comment)
 
-    def callback_proxy(fake_data: c_void_p) -> c_bool:
-        res = callback(callback_data)
-        return c_bool(res)
+    def callback_proxy(fake_data: c_void_p):
+        return callback(callback_data)
 
     CBFUNC = CFUNCTYPE(c_bool, c_void_p)
     cb_func = CBFUNC(callback_proxy)

@@ -15,10 +15,7 @@ def does_not_raise():
 
 
 def user_function(value: str) -> bool:
-    if value == "correct":
-        return True
-    else:
-        return False
+    return value == "correct"
 
 
 @pytest.mark.parametrize(
