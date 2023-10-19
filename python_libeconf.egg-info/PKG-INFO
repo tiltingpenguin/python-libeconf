@@ -8,6 +8,8 @@ License-File: LICENSE
 Provides-Extra: doc-requires
 Requires-Dist: sphinx; extra == "doc-requires"
 Requires-Dist: sphinx-rtd-theme; extra == "doc-requires"
+Provides-Extra: test-requires
+Requires-Dist: pytest; extra == "test-requires"
 
 # python-libeconf
 
@@ -19,4 +21,3 @@ It reads configuration file snippets from different directories and builds the f
 the application from it.
 
 You can find our documentation ***[here](https://tiltingpenguin.github.io/python-libeconf/index.html)***.
-

@@ -2,3 +2,6 @@
 [doc_requires]
 sphinx
 sphinx-rtd-theme
+
+[test_requires]
+pytest
