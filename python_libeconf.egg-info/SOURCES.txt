@@ -7,7 +7,6 @@ python_libeconf.egg-info/SOURCES.txt
 python_libeconf.egg-info/dependency_links.txt
 python_libeconf.egg-info/requires.txt
 python_libeconf.egg-info/top_level.txt
-test/test.py
 test/test_econf.py
 test/test_econf_getters.py
 test/test_econf_getters_def.py

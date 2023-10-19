@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: python-libeconf
-Version: 1.0.0
+Version: 1.1.0
 Summary: Python bindings for libeconf
 Author-email: nkrapp <nico.krapp@suse.com>
 Description-Content-Type: text/markdown
