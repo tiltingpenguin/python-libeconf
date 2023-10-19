@@ -9,6 +9,8 @@ Functions to interact with config files
 
 .. autofunction:: econf.read_file
 
+.. autofunction:: econf.read_file_with_callback
+
 .. autofunction:: econf.new_key_file
 
 .. autofunction:: econf.new_ini_file
@@ -17,9 +19,23 @@ Functions to interact with config files
 
 .. autofunction:: econf.read_dirs
 
+.. autofunction:: econf.read_dirs_with_callback
+
 .. autofunction:: econf.read_dirs_history
 
+.. autofunction:: econf.read_dirs_history_with_callback
+
+.. autofunction:: econf.comment_tag
+
+.. autofunction:: econf.set_comment_tag
+
+.. autofunction:: econf.delimiter_tag
+
+.. autofunction:: econf.set_delimiter_tag
+
 .. autofunction:: econf.write_file
+
+.. autofunction:: econf.get_path
 
 Functions for getting values
 ----------------------------
@@ -53,6 +69,8 @@ Functions for getting values with defaults
 
 Functions for setting values
 ----------------------------
+
+.. autofunction:: econf.set_value
 
 .. autofunction:: econf.set_int_value
 
