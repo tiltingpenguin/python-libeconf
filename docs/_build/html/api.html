@@ -759,6 +759,7 @@ If the function returns False the parsing will be aborted and an Exception will 
 <dt class="sig sig-object py" id="econf.free_file">
 <span class="sig-prename descclassname"><span class="pre">econf.</span></span><span class="sig-name descname"><span class="pre">free_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ef</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EconfFile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#econf.free_file" title="Link to this definition"></a></dt>
 <dd><p>Free the memory of a given keyfile</p>
+<p>This function is called automatically at the end of every objects lifetime and should not be used otherwise</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ef</strong> – EconfFile to be freed</p>
